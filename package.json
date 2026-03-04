@@ -6,7 +6,8 @@
     "start": "nx serve pos --port 4200",
     "dev": "nx serve pos --port 4200",
     "build": "nx build pos",
-    "serve:prod": "nx serve-static pos"
+    "serve:prod": "nx serve-static pos",
+    "deploy": "npm run build -- --base-href=/pos/ && gh-pages -d dist/apps/pos/browser"
   },
   "private": true,
   "devDependencies": {
@@ -44,6 +45,7 @@
     "angular-eslint": "^21.0.1",
     "eslint": "^9.8.0",
     "eslint-config-prettier": "^10.0.0",
+    "gh-pages": "^6.3.0",
     "jsdom": "^27.1.0",
     "nx": "22.5.4",
     "prettier": "~3.6.2",
