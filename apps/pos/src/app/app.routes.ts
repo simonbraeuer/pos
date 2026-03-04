@@ -1,9 +1,10 @@
 import { Routes } from "@angular/router";
 import { ShellComponent } from "@pos/pos-shell";
 import { LoginComponent } from "@pos/login";
-import { authGuard, adminGuard } from "@pos/login";
+import { authGuard, adminGuard, loginGuard } from "@pos/login";
 
 export const appRoutes: Routes = [
+  { path: "login", component: LoginComponent, canActivate: [loginGuard] },
   {
     path: "",
     component: ShellComponent,
@@ -28,6 +29,5 @@ export const appRoutes: Routes = [
       },
     ],
   },
-  { path: "login", component: LoginComponent },
   { path: "**", redirectTo: "" },
 ];

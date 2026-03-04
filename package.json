@@ -2,12 +2,17 @@
   "name": "@pos/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "start": "nx serve pos --port 4200",
+    "dev": "nx serve pos --port 4200",
+    "build": "nx build pos",
+    "serve:prod": "nx serve-static pos"
+  },
   "private": true,
   "devDependencies": {
     "@analogjs/vite-plugin-angular": "~2.1.2",
     "@analogjs/vitest-angular": "~2.1.2",
-    "@angular-devkit/build-angular": "^21.2.0",
+    "@angular-devkit/build-angular": "^20.3.19",
     "@angular-devkit/core": "^21.2.0",
     "@angular-devkit/schematics": "^21.2.0",
     "@angular/animations": "^21.2.1",
@@ -50,6 +55,5 @@
     "vite": "^7.0.0",
     "vitest": "^4.0.8",
     "zone.js": "^0.16.1"
-  },
-  "dependencies": {}
+  }
 }

@@ -12,7 +12,9 @@ function simulateLatency(): Promise<void> {
 /** Randomly reject ~5 % of requests to simulate transient failures. */
 function maybeNetworkError(): void {
   if (Math.random() < 0.05) {
-    throw { status: 503, message: 'Service temporarily unavailable' };
+    const err = new Error('Service temporarily unavailable') as any;
+    err.status = 503;
+    throw err;
   }
 }
 
@@ -47,7 +49,9 @@ export class AuthApiService {
     );
 
     if (!user || user.passwordHash !== btoa(req.password)) {
-      throw { status: 401, message: 'Invalid username or password' };
+      const err = new Error('Invalid username or password') as any;
+      err.status = 401;
+      throw err;
     }
 
     const token = crypto.randomUUID();

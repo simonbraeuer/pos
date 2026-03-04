@@ -31,7 +31,9 @@ function simulateLatency(): Promise<void> {
 /** Randomly reject ~5 % of requests to simulate transient failures. */
 function maybeNetworkError(): void {
   if (Math.random() < 0.05) {
-    throw { status: 503, message: 'Service temporarily unavailable' };
+    const err = new Error('Service temporarily unavailable') as any;
+    err.status = 503;
+    throw err;
   }
 }
 
@@ -78,7 +80,11 @@ export class UserApiService {
     const db   = await this.idb.open();
     const tx   = db.transaction('users', 'readonly');
     const user = await idbReq<User | undefined>(tx.objectStore('users').get(id));
-    if (!user) throw { status: 404, message: 'User not found' };
+    if (!user) {
+      const err = new Error('User not found') as any;
+      err.status = 404;
+      throw err;
+    }
     const { passwordHash: _ph, ...pub } = user;
     return pub;
   }
@@ -104,7 +110,11 @@ export class UserApiService {
     const tx    = db.transaction('users', 'readwrite');
     const store = tx.objectStore('users');
     const user  = await idbReq<User | undefined>(store.get(id));
-    if (!user) throw { status: 404, message: 'User not found' };
+    if (!user) {
+      const err = new Error('User not found') as any;
+      err.status = 404;
+      throw err;
+    }
     const updated: User = { ...user, ...req };
     await idbReq(store.put(updated));
     const { passwordHash: _ph, ...pub } = updated;
@@ -122,10 +132,16 @@ export class UserApiService {
     const tx    = db.transaction('users', 'readwrite');
     const store = tx.objectStore('users');
     const user  = await idbReq<User | undefined>(store.get(req.userId));
-    if (!user) throw { status: 404, message: 'User not found' };
+    if (!user) {
+      const err = new Error('User not found') as any;
+      err.status = 404;
+      throw err;
+    }
     if (req.currentPassword !== undefined &&
         user.passwordHash !== btoa(req.currentPassword)) {
-      throw { status: 400, message: 'Current password is incorrect' };
+      const err = new Error('Current password is incorrect') as any;
+      err.status = 400;
+      throw err;
     }
     await idbReq(store.put({ ...user, passwordHash: btoa(req.newPassword) }));
   }
