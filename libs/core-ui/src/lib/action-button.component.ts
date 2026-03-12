@@ -19,15 +19,21 @@ import { CommonModule } from '@angular/common';
   styles: [
     `
       :host {
+        --action-button-scale: clamp(0.56rem, 7.2cqi, 0.82rem);
         display: block;
         width: 100%;
         aspect-ratio: 1 / 1;
+        height: 100%;
         min-width: 0;
+        min-height: 0;
+        container-type: size;
       }
 
       .action-button {
         width: 100%;
         height: 100%;
+        min-height: 0;
+        font-size: var(--action-button-scale);
         border: 1px solid #3f5399;
         border-radius: 10px;
         background: linear-gradient(145deg, #6076d1 0%, #4d61bb 100%);
@@ -37,8 +43,8 @@ import { CommonModule } from '@angular/common';
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 0.45rem;
-        padding: 0.7rem;
+        gap: 0.45em;
+        padding: 0.8em;
         transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
         box-shadow: 0 4px 12px rgba(45, 58, 112, 0.28);
       }
@@ -63,7 +69,7 @@ import { CommonModule } from '@angular/common';
       }
 
       .action-button__icon {
-        font-size: clamp(1.1rem, 1.8vw, 1.5rem);
+        font-size: 1.8em;
         line-height: 1;
       }
 
@@ -80,8 +86,18 @@ import { CommonModule } from '@angular/common';
         hyphens: none;
         text-align: center;
         line-height: 1.15;
-        font-size: clamp(0.72rem, 1.1vw, 0.86rem);
+        font-size: 1em;
         font-weight: 700;
+      }
+
+      @container (max-width: 4.25rem) {
+        .action-button {
+          gap: 0;
+        }
+
+        .action-button__icon {
+          display: none;
+        }
       }
     `,
   ],

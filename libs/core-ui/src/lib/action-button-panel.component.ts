@@ -14,11 +14,13 @@ import { CommonModule } from '@angular/common';
     `
       :host {
         display: block;
+        width: 100%;
       }
 
       .action-button-panel {
         --panel-cols: 3;
         display: grid;
+        width: 100%;
         grid-template-columns: repeat(var(--panel-cols), minmax(0, 1fr));
         gap: 0.75rem;
       }
