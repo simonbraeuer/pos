@@ -10,7 +10,7 @@ import { ActionButtonComponent } from '@pos/core-ui';
     <lib-action-button
       icon="💳"
       text="Card (offline)"
-      [onClick]="navigate"
+      (onClick)="navigate()"
     />
   `,
   styles: [''],

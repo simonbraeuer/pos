@@ -90,16 +90,13 @@ export class ActionButtonComponent {
   @Input() icon = '';
   @Input() text = '';
   @Input() disabled = false;
-  @Input() onClick?: () => void;
-
-  @Output() actionClick = new EventEmitter<void>();
+  @Output() onClick = new EventEmitter<void>();
 
   handleClick(): void {
     if (this.disabled) {
       return;
     }
 
-    this.onClick?.();
-    this.actionClick.emit();
+    this.onClick.emit();
   }
 }
