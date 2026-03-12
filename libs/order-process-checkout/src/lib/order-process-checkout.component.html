@@ -1,0 +1,157 @@
+<div class="checkout">
+  <div class="checkout__header">
+    <h2>Checkout</h2>
+  </div>
+
+    @if (loading()) {
+      <div class="checkout__loading">
+        <p>Loading payments...</p>
+      </div>
+    } @else {
+      <div class="checkout__content">
+        <!-- Left: Payments and Totals -->
+        <div class="checkout__left">
+          <!-- Payments Section -->
+          <div class="payments-section">
+            <h3>Payments</h3>
+            
+            @if (hasPayments()) {
+              <div class="payment-list">
+                @for (payment of visiblePayments(); track payment.id) {
+                    <ng-container
+                      *ngComponentOutlet="
+                        getPaymentItemComponent(payment);
+                        inputs: {
+                          payment: payment,
+                          formatAmount: formatAmount
+                        }
+                      "
+                    />
+                }
+              </div>
+            } @else {
+              <div class="no-payments">
+                <p class="no-payments__hint">
+                  <strong>No payments recorded</strong>
+                </p>
+                <p class="no-payments__instruction">
+                  Please perform payment(s) to complete this order.
+                </p>
+              </div>
+            }
+          </div>
+
+          <!-- Totals Section -->
+          <div class="totals-section">
+            <div class="total-line">
+              <span class="total-line__label">Paid Amount:</span>
+              <span class="total-line__value total-line__value--paid">
+                {{ formatAmount(paidAmount()) }}
+              </span>
+            </div>
+            <div class="total-line">
+              <span class="total-line__label">Total Amount:</span>
+              <span class="total-line__value total-line__value--total">
+                {{ formatAmount(totalAmount()) }}
+              </span>
+            </div>
+            <div class="total-line total-line--separator"></div>
+            <div class="total-line total-line--outstanding">
+              <span class="total-line__label">Outstanding Amount:</span>
+              <span 
+                class="total-line__value total-line__value--outstanding"
+                [class.total-line__value--negative]="outstandingAmount() < 0"
+                [class.total-line__value--zero]="outstandingAmount() === 0"
+              >
+                {{ formatAmount(outstandingAmount()) }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Checkout Actions Panel -->
+        <div class="checkout__right">
+          <div class="actions-panel">
+            <h3>Actions</h3>
+            <lib-action-button-panel>
+              @for (action of checkoutActions(); track action.id) {
+                <div 
+                  class="action-slot"
+                  [style.grid-column]="'span ' + action.cols"
+                  [style.grid-row]="'span ' + action.rows"
+                >
+                  <ng-container *ngComponentOutlet="action.component" />
+                </div>
+              }
+            </lib-action-button-panel>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (showPendingRefundOverlay()) {
+      <div class="pending-overlay" role="dialog" aria-modal="true" aria-label="Pending refund">
+        <div class="pending-overlay__card" (click)="$event.stopPropagation()">
+          @if (activePendingRefundOverlay()) {
+            <ng-container
+              *ngComponentOutlet="
+                activePendingRefundOverlay()!.refundOverlayUi;
+                inputs: {
+                  payment: activePendingRefundPayment()!,
+                  onRefundFinalized: onPendingRefundFinalized
+                }
+              "
+            />
+          } @else {
+            <section class="pending-overlay-fallback">
+              <h3 class="pending-overlay-fallback__title">Pending Refund Requires Attention</h3>
+              <p class="pending-overlay-fallback__text">
+                A pending refund is blocking checkout, but no overlay handler is registered for this method.
+              </p>
+              <dl class="pending-overlay-fallback__details">
+                <dt>Payment ID</dt>
+                <dd>{{ activePendingRefundPayment()!.id }}</dd>
+                <dt>Method</dt>
+                <dd>{{ pendingRefundMethodLabel() }}</dd>
+                <dt>Amount</dt>
+                <dd>{{ pendingRefundAmountLabel() }}</dd>
+              </dl>
+            </section>
+          }
+        </div>
+      </div>
+    }
+
+  @if (showPendingOverlay()) {
+    <div class="pending-overlay" role="dialog" aria-modal="true" aria-label="Pending payment">
+      <div class="pending-overlay__card" (click)="$event.stopPropagation()">
+        @if (activePendingOverlay()) {
+          <ng-container
+            *ngComponentOutlet="
+              activePendingOverlay()!.pendingOverlayUi;
+              inputs: {
+                payment: activePendingPayment()!,
+                onPaymentFinalized: onPendingPaymentFinalized
+              }
+            "
+          />
+        } @else {
+          <section class="pending-overlay-fallback">
+            <h3 class="pending-overlay-fallback__title">Pending Payment Requires Attention</h3>
+            <p class="pending-overlay-fallback__text">
+              A pending payment is blocking checkout, but no overlay handler is registered for this method.
+            </p>
+            <dl class="pending-overlay-fallback__details">
+              <dt>Payment ID</dt>
+              <dd>{{ activePendingPayment()!.id }}</dd>
+              <dt>Method</dt>
+              <dd>{{ pendingPaymentMethodLabel() }}</dd>
+              <dt>Amount</dt>
+              <dd>{{ pendingPaymentAmountLabel() }}</dd>
+            </dl>
+          </section>
+        }
+      </div>
+    </div>
+  }
+</div>

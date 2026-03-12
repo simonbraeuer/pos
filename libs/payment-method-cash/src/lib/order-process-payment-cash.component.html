@@ -1,0 +1,74 @@
+<lib-process-content-layout
+  icon="💵"
+  title="Cash Payment"
+  [showAbort]="true"
+  (abort)="goBack()"
+>
+  <div slot="content" class="payment-form">
+    <div class="form-group">
+      <label for="amount" class="form-label">
+        Payment Amount
+        @if (outstandingAmount() > 0) {
+          <span class="form-label__hint">(Outstanding: {{ formatAmount(outstandingAmount()) }})</span>
+        }
+      </label>
+      <div class="amount-input-group">
+        <span class="currency-symbol">€</span>
+        <input
+          id="amount"
+          type="number"
+          class="form-input form-input--amount"
+          [(ngModel)]="amount"
+          [min]="0"
+          [step]="0.01"
+          [disabled]="processing()"
+          placeholder="0.00"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="notes" class="form-label">
+        Notes / Reference
+        <span class="form-label__optional">(optional)</span>
+      </label>
+      <textarea
+        id="notes"
+        class="form-input form-input--textarea"
+        [(ngModel)]="notes"
+        [disabled]="processing()"
+        rows="3"
+        placeholder="Add any notes or reference information..."
+      ></textarea>
+    </div>
+
+    @if (error()) {
+      <div class="error-message" role="alert">
+        Warning: {{ error() }}
+      </div>
+    }
+  </div>
+
+  <div slot="nav-buttons" class="form-actions">
+    <button
+      class="btn btn--secondary"
+      (click)="goBack()"
+      type="button"
+      [disabled]="processing()"
+    >
+      Cancel
+    </button>
+    <button
+      class="btn btn--primary"
+      (click)="pay()"
+      type="button"
+      [disabled]="processing() || amount() <= 0"
+    >
+      @if (processing()) {
+        Processing...
+      } @else {
+        Pay {{ formatAmount(amount()) }}
+      }
+    </button>
+  </div>
+</lib-process-content-layout>

@@ -1,0 +1,60 @@
+:host {
+  display: block;
+  height: 100%;
+  min-height: 0;
+}
+
+.order-process {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 1.5rem;
+  height: calc(100vh - 56px);
+  max-height: calc(100vh - 56px);
+  min-height: 0;
+  overflow: hidden;
+
+  &__left,
+  &__right {
+    min-height: 0;
+  }
+
+  &__left {
+    display: flex;
+    overflow: hidden;
+
+    > pos-order {
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+  }
+
+  &__right {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1.5rem;
+
+    > :not(router-outlet) {
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+
+    > router-outlet {
+      flex: 0 0 auto;
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  .order-process {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+}

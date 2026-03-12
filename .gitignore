@@ -20,3 +20,7 @@ out-tsc
 # Env
 *.env
 .env.*
+
+.angular
+
+vitest.config.*.timestamp*

@@ -1,0 +1,106 @@
+<lib-process-content-layout
+  icon="🧾"
+  title="Receipt Options"
+  [showAbort]="true"
+  (abort)="cancel()"
+>
+  <div slot="content" class="receipt-options__body">
+    <p class="receipt-options__description">
+      Configure how the receipt should be delivered after each transaction.
+      Your selection is saved as the default for future checkouts.
+    </p>
+
+    <!-- Output type selection -->
+    <section class="receipt-options__section">
+      <h3 class="receipt-options__section-title">Output type</h3>
+
+      <label class="radio-option" [class.radio-option--selected]="outputType() === 'pdf'">
+        <input
+          type="radio"
+          name="outputType"
+          value="pdf"
+          [ngModel]="outputType()"
+          (ngModelChange)="outputType.set($event)"
+        />
+        <span class="radio-option__icon">📄</span>
+        <span class="radio-option__content">
+          <span class="radio-option__label">A4 PDF</span>
+          <span class="radio-option__hint">Opens a printable PDF in the browser</span>
+        </span>
+      </label>
+
+      <label class="radio-option" [class.radio-option--selected]="outputType() === 'printer'">
+        <input
+          type="radio"
+          name="outputType"
+          value="printer"
+          [ngModel]="outputType()"
+          (ngModelChange)="outputType.set($event)"
+        />
+        <span class="radio-option__icon">🖨️</span>
+        <span class="radio-option__content">
+          <span class="radio-option__label">Printer</span>
+          <span class="radio-option__hint">Send directly to a receipt printer</span>
+        </span>
+      </label>
+    </section>
+
+    <!-- Printer selection (visible only when outputType === 'printer') -->
+    @if (outputType() === 'printer') {
+      <section class="receipt-options__section">
+        <h3 class="receipt-options__section-title">Select printer</h3>
+
+        @if (loading()) {
+          <p class="receipt-options__loading">Loading printers…</p>
+        } @else if (availablePrinters().length === 0) {
+          <p class="receipt-options__empty">
+            No printers found on the current hardware station.
+          </p>
+        } @else {
+          <div class="printer-list">
+            @for (printer of availablePrinters(); track printer.id) {
+              <label
+                class="printer-item"
+                [class.printer-item--selected]="selectedPrinterId() === printer.id"
+              >
+                <input
+                  type="radio"
+                  name="printer"
+                  [value]="printer.id"
+                  [ngModel]="selectedPrinterId()"
+                  (ngModelChange)="selectedPrinterId.set($event)"
+                />
+                <span class="printer-item__name">{{ printer.name }}</span>
+                <span class="printer-item__station">{{ printer.hardwareStationName }}</span>
+              </label>
+            }
+          </div>
+        }
+      </section>
+    }
+  </div>
+
+  <div slot="side" class="receipt-options__station-info">
+    @if (currentTablet()) {
+      <span class="badge badge--info">
+        Hardware station: <strong>{{ currentTablet()!.locationName }}</strong>
+      </span>
+    } @else {
+      <span class="badge badge--warning">
+        No tablet selected — all printers are shown.
+      </span>
+    }
+  </div>
+
+  <div slot="nav-buttons" class="receipt-options__footer">
+    <button class="btn btn--secondary" type="button" (click)="cancel()">Cancel</button>
+    <button
+      class="btn btn--primary"
+      type="button"
+      [disabled]="outputType() === 'printer' && !selectedPrinterId()"
+      (click)="save()"
+    >
+      Save
+    </button>
+  </div>
+</lib-process-content-layout>

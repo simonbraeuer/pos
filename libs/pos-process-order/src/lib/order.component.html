@@ -1,0 +1,112 @@
+<article class="order-card" aria-labelledby="order-title">
+  <header class="order-card__header">
+    <h2 id="order-title">Order</h2>
+  </header>
+
+  <p class="order-card__id">
+    Order ID:
+    <button
+      type="button"
+      class="order-card__id-button"
+      [attr.aria-expanded]="summaryVisible()"
+      [attr.aria-controls]="'order-summary-panel'"
+      (click)="toggleSummary($event)"
+    >
+      {{ order.id }}
+    </button>
+  </p>
+
+  @if (summaryVisible() && hasSummaryData) {
+    <div class="order-card__summary-backdrop" (click)="dismissSummary()"></div>
+    <aside
+      id="order-summary-panel"
+      class="order-card__summary"
+      role="dialog"
+      aria-modal="false"
+      aria-labelledby="order-summary-title"
+      [style.top.px]="summaryPanelTop()"
+      [style.left.px]="summaryPanelLeft()"
+      (click)="$event.stopPropagation()"
+    >
+      <header class="order-card__summary-head">
+        <h3 id="order-summary-title" class="order-card__summary-title">Order Summary</h3>
+        <button
+          type="button"
+          class="order-card__summary-close"
+          (click)="dismissSummary()"
+          aria-label="Close summary"
+        >
+          x
+        </button>
+      </header>
+
+      <dl class="order-card__summary-grid">
+        @for (entry of summaryRows; track entry.label) {
+          <div class="order-card__summary-row">
+            <dt class="order-card__summary-label">{{ entry.label }}</dt>
+            <dd class="order-card__summary-value">{{ entry.value }}</dd>
+          </div>
+        }
+      </dl>
+
+      @if (orderDescription) {
+        <p class="order-card__summary-description">{{ orderDescription }}</p>
+      }
+    </aside>
+  }
+
+  <section class="order-card__items" aria-labelledby="order-items-title">
+    <h3 id="order-items-title">
+      Items
+      <span class="order-card__item-count">({{ itemCount }})</span>
+    </h3>
+    @if (hasItems) {
+      <ul class="order-card__item-list">
+        @for (item of displayItems; track trackByItem($index, item)) {
+          <li class="order-card__item">
+            <header class="order-card__item-header">
+              <strong class="order-card__item-name">{{ item.name }}</strong>
+              <span class="order-card__quantity">Qty: {{ item.quantity }}</span>
+            </header>
+
+            @if (item.description) {
+              <p class="order-card__item-description">{{ item.description }}</p>
+            }
+
+            @for (price of item.prices; track trackByPrice($index, price)) {
+              <div class="order-card__item-price">
+                <span>{{ price.name }}</span>
+                <span class="order-card__price-amount">
+                  {{ price.price.taxIncludedAmount?.value | number: '1.2-2' }}
+                  {{ price.price.taxIncludedAmount?.unit }}
+                </span>
+              </div>
+            }
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="order-card__empty">Order has no items</p>
+    }
+  </section>
+
+  @if (hasTotals) {
+    <section class="order-card__totals" aria-labelledby="order-totals-title">
+      <h3 id="order-totals-title">Totals</h3>
+      <div class="order-card__total-line">
+        <div class="order-card__total-row">
+          <span class="order-card__label">Subtotal (excl. tax):</span>
+          <span class="order-card__amount">{{ subtotalPrice }}</span>
+        </div>
+        <div class="order-card__total-row order-card__total-row--tax">
+          <span class="order-card__label">{{ taxLabel }}</span>
+          <span class="order-card__amount">{{ taxAmount }}</span>
+        </div>
+        <div class="order-card__total-row order-card__total-row--grand-total">
+          <span class="order-card__label">Total (incl. tax):</span>
+          <span class="order-card__amount">{{ totalPrice }}</span>
+        </div>
+      </div>
+    </section>
+  }
+</article>

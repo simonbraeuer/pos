@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, from } from 'rxjs';
-import { IdbService, idbReq } from '@pos/auth';
-import { PublicUser, User } from '@pos/auth';
+import { Observable, throwError } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
+import { Tmf720ApiService, DigitalIdentity } from '@pos/tmf720';
+import type { PublicUser } from '@pos/auth';
 
 export interface CreateUserRequest {
   username: string;
@@ -23,126 +24,178 @@ export interface ChangePasswordRequest {
   newPassword: string;
 }
 
-/** Simulates realistic API network latency (150–800 ms). */
-function simulateLatency(): Promise<void> {
-  return new Promise(r => setTimeout(r, 150 + Math.random() * 650));
-}
-
-/** Randomly reject ~5 % of requests to simulate transient failures. */
-function maybeNetworkError(): void {
-  if (Math.random() < 0.05) {
-    const err = new Error('Service temporarily unavailable') as any;
-    err.status = 503;
-    throw err;
-  }
-}
-
 @Injectable({ providedIn: 'root' })
 export class UserApiService {
-  private idb = inject(IdbService);
+  private tmf720 = inject(Tmf720ApiService);
 
   // ── Public API ──────────────────────────────────────────────────────────
 
   getUsers(): Observable<PublicUser[]> {
-    return from(simulateLatency().then(() => { maybeNetworkError(); return this.doGetAll(); }));
+    return this.tmf720
+      .searchDigitalIdentities({ identityType: 'individual', page: 1, pageSize: 500 })
+      .pipe(
+        map((res) =>
+          res.items
+            .filter((i) => i.status !== 'revoked')
+            .map((i) => this.toPublicUser(i))
+        )
+      );
   }
 
   getUser(id: string): Observable<PublicUser> {
-    return from(simulateLatency().then(() => { maybeNetworkError(); return this.doGet(id); }));
+    return this.tmf720.getDigitalIdentity(id).pipe(map((identity) => this.toPublicUser(identity)));
   }
 
   createUser(req: CreateUserRequest): Observable<PublicUser> {
-    return from(simulateLatency().then(() => { maybeNetworkError(); return this.doCreate(req); }));
+    return this.tmf720
+      .searchDigitalIdentities({ identityType: 'individual', page: 1, pageSize: 500 })
+      .pipe(
+        switchMap((res) => {
+          const duplicate = res.items.some((i) => this.getAttribute(i, 'username') === req.username);
+          if (duplicate) {
+            const err = new Error('Username already exists') as any;
+            err.status = 409;
+            return throwError(() => err);
+          }
+
+          return this.tmf720.createDigitalIdentity({
+            identityType: 'individual',
+            verificationLevel: 'low',
+            credential: [
+              {
+                credentialType: 'password',
+                status: 'active',
+                credentialValue: btoa(req.password),
+              },
+            ],
+            attribute: [
+              {
+                name: 'username',
+                value: req.username,
+                verificationStatus: 'verified',
+                verifiedDate: new Date().toISOString(),
+              },
+              {
+                name: 'email',
+                value: req.email,
+                verificationStatus: 'verified',
+                verifiedDate: new Date().toISOString(),
+              },
+              {
+                name: 'displayName',
+                value: req.displayName,
+                verificationStatus: 'verified',
+                verifiedDate: new Date().toISOString(),
+              },
+              {
+                name: 'role',
+                value: req.role,
+                verificationStatus: 'verified',
+                verifiedDate: new Date().toISOString(),
+              },
+            ],
+            relatedParty: [
+              {
+                id: req.username,
+                name: req.displayName,
+                role: 'owner',
+                '@referredType': 'Individual',
+              },
+            ],
+          });
+        }),
+        map((identity) => this.toPublicUser(identity))
+      );
   }
 
   updateUser(id: string, req: UpdateUserRequest): Observable<PublicUser> {
-    return from(simulateLatency().then(() => { maybeNetworkError(); return this.doUpdate(id, req); }));
+    return this.tmf720.getDigitalIdentity(id).pipe(
+      switchMap((identity) => {
+        const updates = [] as { id: string; value: string }[];
+
+        const email = this.findAttribute(identity, 'email');
+        if (email && req.email !== undefined) {
+          updates.push({ id: email.id, value: req.email });
+        }
+
+        const displayName = this.findAttribute(identity, 'displayName');
+        if (displayName && req.displayName !== undefined) {
+          updates.push({ id: displayName.id, value: req.displayName });
+        }
+
+        const role = this.findAttribute(identity, 'role');
+        if (role && req.role !== undefined) {
+          updates.push({ id: role.id, value: req.role });
+        }
+
+        return this.tmf720.updateDigitalIdentity(id, {
+          attribute: updates.map((u) => ({ id: u.id, value: u.value })),
+        });
+      }),
+      map((identity) => this.toPublicUser(identity))
+    );
   }
 
   deleteUser(id: string): Observable<void> {
-    return from(simulateLatency().then(() => { maybeNetworkError(); return this.doDelete(id); }));
+    return this.tmf720.deleteDigitalIdentity(id);
   }
 
   changePassword(req: ChangePasswordRequest): Observable<void> {
-    return from(simulateLatency().then(() => { maybeNetworkError(); return this.doChangePassword(req); }));
+    return this.tmf720.getDigitalIdentity(req.userId).pipe(
+      switchMap((identity) => {
+        const passwordCredential = identity.credential?.find(
+          (c) => c.credentialType === 'password' && c.status === 'active'
+        );
+
+        if (!passwordCredential) {
+          const err = new Error('Password credential not found') as any;
+          err.status = 404;
+          return throwError(() => err);
+        }
+
+        if (
+          req.currentPassword !== undefined &&
+          passwordCredential.credentialValue !== btoa(req.currentPassword)
+        ) {
+          const err = new Error('Current password is incorrect') as any;
+          err.status = 400;
+          return throwError(() => err);
+        }
+
+        return this.tmf720.updateDigitalIdentity(req.userId, {
+          credential: [
+            {
+              id: passwordCredential.id,
+              credentialValue: btoa(req.newPassword),
+              lastUsedDate: new Date().toISOString(),
+            },
+          ],
+        });
+      }),
+      map(() => undefined)
+    );
   }
 
-  // ── Internal helpers ────────────────────────────────────────────────────
+  private toPublicUser(identity: DigitalIdentity): PublicUser {
+    const username = this.getAttribute(identity, 'username') || identity.id;
+    const email = this.getAttribute(identity, 'email') || `${username}@pos.local`;
+    const displayName = this.getAttribute(identity, 'displayName') || username;
+    const role = this.getAttribute(identity, 'role') === 'admin' ? 'admin' : 'user';
 
-  private async doGetAll(): Promise<PublicUser[]> {
-    const db    = await this.idb.open();
-    const tx    = db.transaction('users', 'readonly');
-    const users = await idbReq<User[]>(tx.objectStore('users').getAll());
-    return users.map(({ passwordHash: _ph, ...u }) => u);
-  }
-
-  private async doGet(id: string): Promise<PublicUser> {
-    const db   = await this.idb.open();
-    const tx   = db.transaction('users', 'readonly');
-    const user = await idbReq<User | undefined>(tx.objectStore('users').get(id));
-    if (!user) {
-      const err = new Error('User not found') as any;
-      err.status = 404;
-      throw err;
-    }
-    const { passwordHash: _ph, ...pub } = user;
-    return pub;
-  }
-
-  private async doCreate(req: CreateUserRequest): Promise<PublicUser> {
-    const db  = await this.idb.open();
-    const newUser: User = {
-      id: crypto.randomUUID(),
-      username: req.username,
-      passwordHash: btoa(req.password),
-      role: req.role,
-      email: req.email,
-      displayName: req.displayName,
+    return {
+      id: identity.id,
+      username,
+      role,
+      email,
+      displayName,
     };
-    const tx = db.transaction('users', 'readwrite');
-    await idbReq(tx.objectStore('users').add(newUser));
-    const { passwordHash: _ph, ...pub } = newUser;
-    return pub;
   }
 
-  private async doUpdate(id: string, req: UpdateUserRequest): Promise<PublicUser> {
-    const db    = await this.idb.open();
-    const tx    = db.transaction('users', 'readwrite');
-    const store = tx.objectStore('users');
-    const user  = await idbReq<User | undefined>(store.get(id));
-    if (!user) {
-      const err = new Error('User not found') as any;
-      err.status = 404;
-      throw err;
-    }
-    const updated: User = { ...user, ...req };
-    await idbReq(store.put(updated));
-    const { passwordHash: _ph, ...pub } = updated;
-    return pub;
+  private getAttribute(identity: DigitalIdentity, name: string): string | undefined {
+    return identity.attribute?.find((a) => a.name === name)?.value;
   }
 
-  private async doDelete(id: string): Promise<void> {
-    const db = await this.idb.open();
-    const tx = db.transaction('users', 'readwrite');
-    await idbReq(tx.objectStore('users').delete(id));
-  }
-
-  private async doChangePassword(req: ChangePasswordRequest): Promise<void> {
-    const db    = await this.idb.open();
-    const tx    = db.transaction('users', 'readwrite');
-    const store = tx.objectStore('users');
-    const user  = await idbReq<User | undefined>(store.get(req.userId));
-    if (!user) {
-      const err = new Error('User not found') as any;
-      err.status = 404;
-      throw err;
-    }
-    if (req.currentPassword !== undefined &&
-        user.passwordHash !== btoa(req.currentPassword)) {
-      const err = new Error('Current password is incorrect') as any;
-      err.status = 400;
-      throw err;
-    }
-    await idbReq(store.put({ ...user, passwordHash: btoa(req.newPassword) }));
+  private findAttribute(identity: DigitalIdentity, name: string) {
+    return identity.attribute?.find((a) => a.name === name);
   }
 }

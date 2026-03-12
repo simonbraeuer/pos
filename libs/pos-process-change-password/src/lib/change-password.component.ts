@@ -4,7 +4,7 @@ import { AuthStateService } from "@pos/login";
 import { UserApiService } from "@pos/user";
 
 @Component({
-  selector: "pos-change-password",
+  selector: "lib-change-password",
   standalone: true,
   imports: [FormsModule],
   template: `

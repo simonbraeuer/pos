@@ -1,0 +1,152 @@
+@use '../../../../shared-styles' as *;
+
+.tablet-selection {
+  max-width: 960px;
+}
+
+.hint {
+  margin-top: -0.25rem;
+  color: #64748b;
+}
+
+.current-selection {
+  margin-bottom: 0.9rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid #dbe5ef;
+  border-radius: 8px;
+  background: #f8fbff;
+
+  .muted {
+    color: #64748b;
+    margin-left: 0.4rem;
+  }
+}
+
+.filter-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-bottom: 1rem;
+
+  input {
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 0.5rem 0.65rem;
+  }
+}
+
+.tree {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.location-node {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #ffffff;
+
+  summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.7rem 0.8rem;
+    border-bottom: 1px solid #eef2f7;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+  }
+}
+
+.location-name {
+  font-weight: 700;
+}
+
+.location-code {
+  color: #64748b;
+  font-family: monospace;
+  font-size: 0.82rem;
+}
+
+.tablet-list {
+  margin: 0;
+  padding: 0.6rem;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.tablet-item {
+  width: 100%;
+  text-align: left;
+  border: 1px solid #dbe5ef;
+  border-radius: 8px;
+  background: #f8fafc;
+  padding: 0.55rem 0.65rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.8rem;
+
+  &:hover {
+    background: #eef6ff;
+    border-color: #93c5fd;
+  }
+
+  &--selected {
+    background: #e0f2fe;
+    border-color: #38bdf8;
+  }
+}
+
+.tablet-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.tablet-code {
+  font-family: monospace;
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+.tablet-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.2rem;
+}
+
+.meta {
+  font-size: 0.78rem;
+  color: #334155;
+}
+
+.empty {
+  color: #64748b;
+}
+
+.btn--link {
+  margin-left: 0.7rem;
+  background: transparent;
+  border: none;
+  color: #0369a1;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .tablet-item {
+    flex-direction: column;
+  }
+
+  .tablet-side {
+    align-items: flex-start;
+  }
+}

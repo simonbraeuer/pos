@@ -1,0 +1,42 @@
+<div class="pcl">
+  <!-- ── Process bar ────────────────────────────────────── -->
+  <header class="pcl__bar">
+    <div class="pcl__bar-lead">
+      @if (icon()) {
+        <span class="pcl__bar-icon" aria-hidden="true">{{ icon() }}</span>
+      }
+      <span class="pcl__bar-title">{{ title() }}</span>
+    </div>
+
+    @if (showAbort()) {
+      <button
+        class="pcl__abort"
+        type="button"
+        aria-label="Abort"
+        title="Abort"
+        (click)="onAbort()"
+      >✕</button>
+    }
+  </header>
+
+  <!-- ── Filter area (non-scrolling) ──────────────────── -->
+  <section class="pcl__filter">
+    <ng-content select="[slot=filter]" />
+  </section>
+
+  <!-- ── Main area (content + side) ────────────────────── -->
+  <div class="pcl__main">
+    <div class="pcl__content">
+      <ng-content select="[slot=content]" />
+    </div>
+
+    <aside class="pcl__side">
+      <ng-content select="[slot=side]" />
+    </aside>
+  </div>
+
+  <!-- ── Nav buttons ────────────────────────────────────── -->
+  <footer class="pcl__nav">
+    <ng-content select="[slot=nav-buttons]" />
+  </footer>
+</div>

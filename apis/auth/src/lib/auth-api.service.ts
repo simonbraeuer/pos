@@ -1,111 +1,109 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, from, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-import { IdbService, idbReq } from './idb.service';
-import { LoginRequest, LoginResponse, Session, User } from './models';
-
-/** Simulates realistic API network latency (150–800 ms). */
-function simulateLatency(): Promise<void> {
-  return new Promise(r => setTimeout(r, 150 + Math.random() * 650));
-}
-
-/** Randomly reject ~5 % of requests to simulate transient failures. */
-function maybeNetworkError(): void {
-  if (Math.random() < 0.05) {
-    const err = new Error('Service temporarily unavailable') as any;
-    err.status = 503;
-    throw err;
-  }
-}
+import { Observable, throwError } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
+import { Tmf691ApiService } from '@pos/tmf691';
+import { Tmf720ApiService, DigitalIdentity } from '@pos/tmf720';
+import { LoginRequest, LoginResponse, Session } from './models';
 
 @Injectable({ providedIn: 'root' })
 export class AuthApiService {
-  private idb = inject(IdbService);
-
-  constructor() { this.seed(); }
+  private tmf691 = inject(Tmf691ApiService);
+  private tmf720 = inject(Tmf720ApiService);
 
   // ── Public API ──────────────────────────────────────────────────────────
 
   login(req: LoginRequest): Observable<LoginResponse> {
-    return from(simulateLatency().then(() => { maybeNetworkError(); return this.doLogin(req); }));
+    return this.tmf720
+      .searchDigitalIdentities({ identityType: 'individual', page: 1, pageSize: 500 })
+      .pipe(
+        map((res) =>
+          res.items.find(
+            (i) =>
+              this.getAttribute(i, 'username') === req.username && i.status !== 'revoked'
+          )
+        ),
+        switchMap((identity) => {
+          if (!identity) {
+            const err = new Error('Invalid username or password') as any;
+            err.status = 401;
+            return throwError(() => err);
+          }
+
+          const passwordCredential = identity.credential?.find(
+            (c) => c.credentialType === 'password' && c.status === 'active'
+          );
+
+          if (!passwordCredential?.credentialValue || passwordCredential.credentialValue !== btoa(req.password)) {
+            const err = new Error('Invalid username or password') as any;
+            err.status = 401;
+            return throwError(() => err);
+          }
+
+          const email = this.getAttribute(identity, 'email') || `${req.username}@pos.local`;
+          const displayName = this.getAttribute(identity, 'displayName') || req.username;
+          const role = this.getRole(identity);
+
+          return this.tmf691
+            .createSessionForUser({
+              userId: identity.id,
+              username: req.username,
+              email,
+              displayName,
+              roles: [role],
+              authenticationMethod: 'password',
+            })
+            .pipe(
+              map((resp) => ({
+                token: resp.token.accessToken,
+                user: {
+                  id: identity.id,
+                  username: req.username,
+                  role,
+                  email,
+                  displayName,
+                },
+              }))
+            );
+        })
+      );
   }
 
   logout(token: string): Observable<void> {
-    return from(simulateLatency().then(() => { maybeNetworkError(); return this.doLogout(token); }));
+    return this.tmf691.logout({ token }).pipe(map(() => undefined));
   }
 
   getSession(token: string): Observable<Session | null> {
-    // Session check is always fast (local read, no artificial failure)
-    return from(this.doGetSession(token));
-  }
+    return this.tmf691.getSessionByToken(token).pipe(
+      map((session) => {
+        if (!session) return null;
 
-  // ── Internal helpers ────────────────────────────────────────────────────
+        const username =
+          session.userIdentity?.username ||
+          (typeof session.claims?.['username'] === 'string' ? session.claims['username'] : 'unknown');
+        const displayName = session.userIdentity?.displayName || username;
+        const role = this.toRole(session.userIdentity?.roles?.[0]);
 
-  private async doLogin(req: LoginRequest): Promise<LoginResponse> {
-    const db = await this.idb.open();
-    const tx  = db.transaction('users', 'readonly');
-    const user = await idbReq<User | undefined>(
-      tx.objectStore('users').index('username').get(req.username)
+        return {
+          token,
+          userId: session.userId,
+          username,
+          role,
+          displayName,
+          expiresAt: new Date(session.expiresAt).getTime(),
+        };
+      })
     );
-
-    if (!user || user.passwordHash !== btoa(req.password)) {
-      const err = new Error('Invalid username or password') as any;
-      err.status = 401;
-      throw err;
-    }
-
-    const token = crypto.randomUUID();
-    const session: Session = {
-      token,
-      userId: user.id,
-      username: user.username,
-      role: user.role,
-      displayName: user.displayName,
-      expiresAt: Date.now() + 8 * 60 * 60 * 1000,   // 8 h
-    };
-
-    const stx = db.transaction('sessions', 'readwrite');
-    await idbReq(stx.objectStore('sessions').add(session));
-
-    const { passwordHash: _ph, ...publicUser } = user;
-    return { token, user: publicUser };
   }
 
-  private async doLogout(token: string): Promise<void> {
-    const db = await this.idb.open();
-    const tx  = db.transaction('sessions', 'readwrite');
-    await idbReq(tx.objectStore('sessions').delete(token));
+  private getAttribute(identity: DigitalIdentity, name: string): string | undefined {
+    return identity.attribute?.find((a) => a.name === name)?.value;
   }
 
-  private async doGetSession(token: string): Promise<Session | null> {
-    const db      = await this.idb.open();
-    const tx      = db.transaction('sessions', 'readonly');
-    const session = await idbReq<Session | undefined>(tx.objectStore('sessions').get(token));
-    if (!session) return null;
-    if (session.expiresAt < Date.now()) {
-      const dtx = db.transaction('sessions', 'readwrite');
-      await idbReq(dtx.objectStore('sessions').delete(token));
-      return null;
-    }
-    return session;
+  private getRole(identity: DigitalIdentity): 'admin' | 'user' {
+    return this.toRole(this.getAttribute(identity, 'role'));
   }
 
-  // ── Seed ────────────────────────────────────────────────────────────────
-
-  private async seed(): Promise<void> {
-    const db    = await this.idb.open();
-    const tx    = db.transaction('users', 'readonly');
-    const count = await idbReq(tx.objectStore('users').count());
-    if (count > 0) return;
-
-    const wtx   = db.transaction('users', 'readwrite');
-    const store = wtx.objectStore('users');
-    const seeds: User[] = [
-      { id: crypto.randomUUID(), username: 'admin', passwordHash: btoa('admin123'),
-        role: 'admin', email: 'admin@pos.local', displayName: 'Administrator' },
-      { id: crypto.randomUUID(), username: 'user',  passwordHash: btoa('user123'),
-        role: 'user',  email: 'user@pos.local',  displayName: 'Regular User'   },
-    ];
-    for (const u of seeds) await idbReq(store.add(u));
+  private toRole(roleLike: string | undefined): 'admin' | 'user' {
+    return roleLike === 'admin' ? 'admin' : 'user';
   }
 }

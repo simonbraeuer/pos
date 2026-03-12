@@ -1,0 +1,166 @@
+<lib-process-content-layout
+  icon="💳"
+  [title]="paymentMethodName()"
+  [showAbort]="true"
+  (abort)="goBack()"
+>
+  <div slot="content" class="payment-form">
+      <div class="form-group">
+        <label for="amount" class="form-label">
+          Payment Amount
+          @if (outstandingAmount() > 0) {
+            <span class="form-label__hint">(Outstanding: {{ formatAmount(outstandingAmount()) }})</span>
+          }
+        </label>
+        <div class="amount-input-group">
+          <span class="currency-symbol">€</span>
+          <input
+            id="amount"
+            type="number"
+            class="form-input form-input--amount"
+            [(ngModel)]="amount"
+            [min]="0"
+            [step]="0.01"
+            [disabled]="processing()"
+            placeholder="0.00"
+          />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group form-group--half">
+          <label for="cardType" class="form-label">Card Type</label>
+          <select
+            id="cardType"
+            class="form-input"
+            [(ngModel)]="cardType"
+            [disabled]="processing()"
+          >
+            <option value="credit">Credit Card</option>
+            <option value="debit">Debit Card</option>
+          </select>
+        </div>
+
+        <div class="form-group form-group--half">
+          <label for="cardHolder" class="form-label">Card Holder</label>
+          <input
+            id="cardHolder"
+            type="text"
+            class="form-input"
+            [(ngModel)]="cardHolder"
+            [disabled]="processing()"
+            placeholder="John Doe"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="cardNumber" class="form-label">Card Number</label>
+        <input
+          id="cardNumber"
+          type="text"
+          class="form-input form-input--card"
+          [(ngModel)]="cardNumber"
+          (input)="formatCardNumber($event)"
+          [disabled]="processing()"
+          placeholder="1234 5678 9012 3456"
+          maxlength="19"
+          inputmode="numeric"
+          required
+        />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group form-group--half">
+          <label for="expiryDate" class="form-label">Expiry Date</label>
+          <input
+            id="expiryDate"
+            type="text"
+            class="form-input"
+            [(ngModel)]="expiryDate"
+            (input)="formatExpiryDate($event)"
+            [disabled]="processing()"
+            placeholder="MM/YY"
+            maxlength="5"
+            inputmode="numeric"
+            required
+          />
+        </div>
+
+        <div class="form-group form-group--half">
+          <label for="cvv" class="form-label">CVV</label>
+          <input
+            id="cvv"
+            type="text"
+            class="form-input"
+            [(ngModel)]="cvv"
+            (input)="onCvvInput($event)"
+            [disabled]="processing()"
+            placeholder="123"
+            maxlength="4"
+            inputmode="numeric"
+            required
+          />
+        </div>
+      </div>
+
+      @if (error()) {
+        <div class="error-message" role="alert">
+          Warning: {{ error() }}
+        </div>
+      }
+  </div>
+
+  <div slot="side" class="action-panel">
+    <h3>Actions</h3>
+    <p class="action-panel__hint">Use the scanner to prefill card data directly on this device.</p>
+
+    <button
+      class="btn btn--secondary action-panel__button"
+      type="button"
+      [disabled]="processing()"
+      (click)="resetForm()"
+    >
+      Reset form
+    </button>
+
+    <button
+      class="btn btn--primary action-panel__button"
+      type="button"
+      [disabled]="processing()"
+      (click)="openCardScanner()"
+    >
+      Scan card
+    </button>
+  </div>
+
+  <div slot="nav-buttons" class="form-actions">
+    <button
+      class="btn btn--secondary"
+      (click)="goBack()"
+      type="button"
+      [disabled]="processing()"
+    >
+      Cancel
+    </button>
+    <button
+      class="btn btn--primary"
+      (click)="pay()"
+      type="button"
+      [disabled]="processing() || !isFormValid()"
+    >
+      @if (processing()) {
+        Processing...
+      } @else {
+        Pay {{ formatAmount(amount()) }}
+      }
+    </button>
+  </div>
+</lib-process-content-layout>
+
+<pos-credit-card-scan-overlay
+  [open]="showCardScanner()"
+  (closed)="closeCardScanner()"
+  (scanned)="onCardScanned($event)"
+/>

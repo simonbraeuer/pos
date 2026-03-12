@@ -1,0 +1,56 @@
+:host {
+  display: block;
+  height: 100%;
+  min-height: 0;
+}
+
+.cart-process {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 1.5rem;
+  height: calc(100vh - 56px);
+  max-height: calc(100vh - 56px);
+  min-height: 0;
+  overflow: hidden;
+
+  &__left,
+  &__right {
+    min-height: 0;
+  }
+
+  &__left {
+    display: flex;
+    overflow: hidden;
+
+    > pos-cart {
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+  }
+
+  &__right {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1.5rem;
+
+    > router-outlet + * {
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  .cart-process {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+}

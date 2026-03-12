@@ -1,0 +1,159 @@
+<div class="orders-container">
+  <div class="header">
+    <h2>📦 Product Orders</h2>
+    <p class="subtitle">Search and browse customer product orders</p>
+  </div>
+
+  <!-- Search Filters -->
+  <div class="search-filters">
+    <div class="filter-row">
+      <label>
+        External Order ID
+        <input
+          type="text"
+          [(ngModel)]="criteria.externalId"
+          placeholder="Search by external ID..."
+          name="externalId"
+        />
+      </label>
+
+      <label>
+        Customer ID
+        <input
+          type="text"
+          [(ngModel)]="criteria.customerId"
+          placeholder="Customer ID..."
+          name="customerId"
+        />
+      </label>
+
+      <label>
+        Order State
+        <select [(ngModel)]="criteria.state" name="state">
+          <option [ngValue]="undefined">All States</option>
+          @for (state of availableStates; track state) {
+            <option [value]="state">{{ state }}</option>
+          }
+        </select>
+      </label>
+    </div>
+
+    <div class="filter-row">
+      <label>
+        Order Date From
+        <input
+          type="date"
+          [(ngModel)]="criteria.orderDateFrom"
+          name="orderDateFrom"
+        />
+      </label>
+
+      <label>
+        Order Date To
+        <input
+          type="date"
+          [(ngModel)]="criteria.orderDateTo"
+          name="orderDateTo"
+        />
+      </label>
+
+      <label>
+        Priority
+        <select [(ngModel)]="criteria.priority" name="priority">
+          <option [ngValue]="undefined">All Priorities</option>
+          <option value="low">Low</option>
+          <option value="normal">Normal</option>
+          <option value="high">High</option>
+          <option value="urgent">Urgent</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="filter-actions">
+      <button
+        class="btn btn--primary"
+        (click)="search()"
+        [disabled]="loading()"
+      >
+        @if (loading()) { Searching... } @else { 🔍 Search }
+      </button>
+      <button class="btn btn--secondary" (click)="clearFilters()">
+        Clear Filters
+      </button>
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="error-message">{{ error() }}</div>
+  }
+
+  <!-- Results Table -->
+  @if (searched() && !loading()) {
+    <div class="results">
+      <div class="results-header">
+        <h3>Results</h3>
+        <span class="results-count">
+          Showing {{ results().length }} of {{ totalResults() }} orders
+        </span>
+      </div>
+
+      @if (results().length === 0) {
+        <div class="no-results">
+          No orders found matching your criteria.
+        </div>
+      } @else {
+        <div class="table-container">
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>External ID</th>
+                <th>Customer</th>
+                <th>Order Date</th>
+                <th>State</th>
+                <th>Priority</th>
+                <th>Items</th>
+                <th>Total Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (order of results(); track order.id) {
+                <tr>
+                  <td class="order-id">
+                    <button class="order-link" type="button" (click)="openOrder(order.id)">
+                      {{ order.id }}
+                    </button>
+                  </td>
+                  <td class="external-id">{{ order.externalId || '—' }}</td>
+                  <td class="customer-name">{{ getCustomerName(order) }}</td>
+                  <td class="order-date">{{ formatDate(order.orderDate) }}</td>
+                  <td>
+                    <span
+                      class="status-badge"
+                      [class.status-completed]="order.state === 'completed'"
+                      [class.status-in-progress]="order.state === 'inProgress'"
+                      [class.status-pending]="order.state === 'pending' || order.state === 'acknowledged'"
+                      [class.status-cancelled]="order.state === 'cancelled' || order.state === 'failed'"
+                    >
+                      {{ order.state || 'acknowledged' }}
+                    </span>
+                  </td>
+                  <td class="priority">{{ order.priority || 'normal' }}</td>
+                  <td class="item-count">{{ getItemCount(order) }}</td>
+                  <td class="price">{{ getTotalPrice(order) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Loading product orders...</p>
+    </div>
+  }
+</div>

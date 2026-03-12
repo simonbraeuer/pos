@@ -16,6 +16,10 @@
     "baseUrl": ".",
     "paths": {
       "@pos/login": ["libs/login/src/index.ts"],
+      "@pos/tablet-selection": ["libs/tablet-selection/src/index.ts"],
+      "@pos/core-ui": ["libs/core-ui/src/index.ts"],
+      "@pos/core-utils": ["libs/core-utils/src/index.ts"],
+      "@pos/idb-storage": ["libs/idb-storage/src/index.ts"],
       "@pos/pos-shell": ["libs/pos-shell/src/index.ts"],
       "@pos/pos-process-show-user": ["libs/pos-process-show-user/src/index.ts"],
       "@pos/pos-process-change-password": [
@@ -24,8 +28,74 @@
       "@pos/pos-process-edit-users": [
         "libs/pos-process-edit-users/src/index.ts"
       ],
+      "@pos/pos-process-edit-product-catalog": [
+        "libs/pos-process-edit-product-catalog/src/index.ts"
+      ],
+      "@pos/pos-process-cart": ["libs/pos-process-cart/src/index.ts"],
+      "@pos/pos-process-search-cart": [
+        "libs/pos-process-search-cart/src/index.ts"
+      ],
+      "@pos/pos-process-new-cart": ["libs/pos-process-new-cart/src/index.ts"],
+      "@pos/pos-process-orders": ["libs/pos-process-orders/src/index.ts"],
+      "@pos/pos-process-order": ["libs/pos-process-order/src/index.ts"],
+      "@pos/order-process-checkout": [
+        "libs/order-process-checkout/src/index.ts"
+      ],
+      "@pos/cart-core": ["libs/cart-core/src/index.ts"],
+      "@pos/cart-process-find-sale-offer": [
+        "libs/cart-process-find-sale-offer/src/index.ts"
+      ],
+      "@pos/cart-process-edit-sale-product-offer": [
+        "libs/cart-process-edit-sale-product-offer/src/index.ts"
+      ],
+      "@pos/cart-process-edit-sale-bundle-offer": [
+        "libs/cart-process-edit-sale-bundle-offer/src/index.ts"
+      ],
+      "@pos/checkout-action-payment-cash": [
+        "libs/checkout-action-payment-cash/src/index.ts"
+      ],
+      "@pos/checkout-receipt-options": [
+        "libs/checkout-receipt-options/src/index.ts"
+      ],
+      "@pos/checkout-action-payment-card-offline": [
+        "libs/checkout-action-payment-card-offline/src/index.ts"
+      ],
+      "@pos/payment-method-cash": [
+        "libs/payment-method-cash/src/index.ts"
+      ],
+      "@pos/payment-method-card-offline": [
+        "libs/payment-method-card-offline/src/index.ts"
+      ],
+      "@pos/pending-payment-default": [
+        "libs/pending-payment-default/src/index.ts"
+      ],
+      "@pos/pending-refund-default": [
+        "libs/pending-refund-default/src/index.ts"
+      ],
       "@pos/auth": ["apis/auth/src/index.ts"],
-      "@pos/user": ["apis/user/src/index.ts"]
+      "@pos/user": ["apis/user/src/index.ts"],
+      "@pos/tmf620": ["apis/tmf620/src/index.ts"],
+      "@pos/tmf622": ["apis/tmf622/src/index.ts"],
+      "@pos/tmf663": ["apis/tmf663/src/index.ts"],
+      "@pos/tmf670": ["apis/tmf670/src/index.ts"],
+      "@pos/tmf676": ["apis/tmf676/src/index.ts"],
+      "@pos/tmf678": ["apis/tmf678/src/index.ts"],
+      "@pos/tmf679": ["apis/tmf679/src/index.ts"],
+      "@pos/tmf688": ["apis/tmf688/src/index.ts"],
+      "@pos/tmf691": ["apis/tmf691/src/index.ts"],
+      "@pos/tmf720": ["apis/tmf720/src/index.ts"],
+      "@pos/location": ["apis/location/src/index.ts"],
+      "@pos/hardware-station": ["apis/hardware-station/src/index.ts"],
+      "@pos/register": ["apis/register/src/index.ts"],
+      "@pos/shift": ["apis/shift/src/index.ts"],
+      "@pos/device": ["apis/device/src/index.ts"],
+      "@pos/pos-process-edit-payment-methods": [
+        "libs/pos-process-edit-payment-methods/src/index.ts"
+      ],
+      "@pos/pos-process-edit-cart-customer": [
+        "libs/pos-process-edit-cart-customer/src/index.ts"
+      ]
+
     }
   },
   "exclude": ["node_modules", "tmp"]

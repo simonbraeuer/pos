@@ -1,0 +1,42 @@
+<div class="payment-item payment-item--card">
+  <div class="payment-item__content">
+    <div class="payment-item__header">
+      <div class="payment-item__icon">🎫</div>
+      <div class="payment-item__details">
+        <h4 class="payment-item__title">{{ getCardInfo().brand }}</h4>
+        <p class="payment-item__meta">**** **** **** {{ getCardInfo().lastFour }}</p>
+      </div>
+    </div>
+
+    <div class="payment-item__status">
+      <span
+        class="payment-item__badge"
+        [class.payment-item__badge--completed]="payment.status === 'completed'"
+        [class.payment-item__badge--authorized]="payment.status === 'authorized'"
+        [class.payment-item__badge--pending]="payment.status === 'pending'"
+        [class.payment-item__badge--failed]="payment.status === 'failed'"
+      >
+        {{ payment.status }}
+      </span>
+
+      <span
+        class="payment-item__amount"
+        [class.payment-item__amount--refund]="isRefundPayment()"
+      >
+        {{ isRefundPayment() ? '−' : '+' }}{{ formatAmount(displayAmount()) }}
+      </span>
+    </div>
+  </div>
+
+  <div class="payment-item__actions">
+    @if (showTrashButton()) {
+      <button
+        class="payment-item__action-btn payment-item__action-btn--trash"
+        (click)="onTrashClick()"
+        title="Remove payment or start refund"
+      >
+        🗑️
+      </button>
+    }
+  </div>
+</div>

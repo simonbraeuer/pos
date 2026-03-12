@@ -2,9 +2,10 @@ import { Component, inject, OnInit, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { UserApiService, CreateUserRequest } from "@pos/user";
 import type { PublicUser } from "@pos/auth";
+import { DialogService } from "@pos/core-ui";
 
 @Component({
-  selector: "pos-edit-users",
+  selector: "lib-edit-users",
   standalone: true,
   imports: [FormsModule],
   template: `
@@ -85,6 +86,7 @@ import type { PublicUser } from "@pos/auth";
 })
 export class EditUsersComponent implements OnInit {
   private userApi = inject(UserApiService);
+  private dialog = inject(DialogService);
 
   users     = signal<PublicUser[]>([]);
   loading   = signal(false);
@@ -128,8 +130,16 @@ export class EditUsersComponent implements OnInit {
     });
   }
 
-  deleteUser(id: string): void {
-    if (!confirm("Delete this user?")) return;
+  async deleteUser(id: string): Promise<void> {
+    const confirmed = await this.dialog.show({
+      title: "Delete User",
+      message: "Delete this user?",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      dismissible: true,
+    });
+    if (!confirmed) return;
+
     this.userApi.deleteUser(id).subscribe({
       next:  () => this.users.update(list => list.filter(u => u.id !== id)),
       error: e  => this.error.set(e?.message),

@@ -1,0 +1,75 @@
+<section class="tablet-selection card wide">
+  <h2>Tablet Selection</h2>
+  <p class="hint">
+    Choose the tablet this POS session is running on.
+  </p>
+
+  @if (currentSelection(); as current) {
+    <div class="current-selection">
+      <strong>Current tablet:</strong>
+      {{ current.deviceName }} ({{ current.deviceCode }})
+      <span class="muted">at {{ current.locationName }}</span>
+      <button type="button" class="btn btn--link" (click)="clearSelection()">Clear</button>
+    </div>
+  }
+
+  <div class="filter-row">
+    <label for="tablet-filter">Filter (location + tablet)</label>
+    <input
+      id="tablet-filter"
+      type="text"
+      [ngModel]="filter()"
+      (ngModelChange)="filter.set($event)"
+      placeholder="Search by location or tablet"
+    />
+  </div>
+
+  @if (error()) {
+    <div class="error">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <div class="loading">Loading locations and tablets...</div>
+  } @else {
+    <div class="tree">
+      @for (node of filteredTree(); track node.location.id) {
+        <details open class="location-node">
+          <summary>
+            <span class="location-name">{{ node.location.name }}</span>
+            <span class="location-code">{{ node.location.code }}</span>
+          </summary>
+
+          <ul class="tablet-list">
+            @for (tabletNode of node.tablets; track tabletNode.device.id) {
+              <li>
+                <button
+                  type="button"
+                  class="tablet-item"
+                  [class.tablet-item--selected]="isSelected(tabletNode.device.id)"
+                  [disabled]="selectingDeviceId() === tabletNode.device.id"
+                  (click)="selectTablet(node.location, tabletNode)"
+                >
+                  <span class="tablet-main">
+                    <strong>{{ tabletNode.device.name }}</strong>
+                    <span class="tablet-code">{{ tabletNode.device.code }}</span>
+                  </span>
+
+                  <span class="tablet-side">
+                    @if (tabletNode.hardwareStation) {
+                      <span class="meta">HW: {{ tabletNode.hardwareStation.name }}</span>
+                    }
+                    @if (tabletNode.register) {
+                      <span class="meta">Register: {{ tabletNode.register.code }}</span>
+                    }
+                  </span>
+                </button>
+              </li>
+            }
+          </ul>
+        </details>
+      } @empty {
+        <p class="empty">No location-tablet combinations match your filter.</p>
+      }
+    </div>
+  }
+</section>

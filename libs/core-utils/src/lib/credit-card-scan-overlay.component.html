@@ -1,0 +1,42 @@
+@if (open()) {
+  <div class="scan-overlay" role="dialog" aria-modal="true" aria-label="Credit card scanner" (click)="close()">
+    <section class="scan-panel" (click)="$event.stopPropagation()">
+      <header class="scan-header">
+        <h2>Credit Card Scan</h2>
+        <button type="button" class="close-button" (click)="close()" [disabled]="isCapturing()">Close</button>
+      </header>
+
+      <div class="camera-shell">
+        <video #cameraVideo class="camera-video" autoplay playsinline muted></video>
+
+        <div class="card-frame" aria-hidden="true">
+          <div class="frame-line frame-line--top"></div>
+          <div class="frame-line frame-line--middle"></div>
+          <div class="frame-line frame-line--bottom"></div>
+        </div>
+      </div>
+
+      <p class="instruction">{{ instruction() }}</p>
+      <p class="privacy-note">All card image processing stays on this device. No recordings are uploaded.</p>
+
+      @if (statusMessage()) {
+        <p class="status">{{ statusMessage() }}</p>
+      }
+
+      @if (scanError()) {
+        <p class="error" role="alert">{{ scanError() }}</p>
+      }
+
+      <footer class="scan-actions">
+        <button type="button" class="btn btn--secondary" (click)="close()" [disabled]="isCapturing()">Cancel</button>
+        <button type="button" class="btn btn--primary" (click)="captureCurrentSide()" [disabled]="isCapturing()">
+          @if (isCapturing()) {
+            Capturing...
+          } @else {
+            Capture Side {{ step() }}
+          }
+        </button>
+      </footer>
+    </section>
+  </div>
+}

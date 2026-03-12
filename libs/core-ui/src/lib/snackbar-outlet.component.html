@@ -1,0 +1,27 @@
+<div class="snackbar-outlet" aria-live="polite" aria-atomic="false">
+  @for (message of snackbar.messages(); track message.id) {
+    <div
+      class="snackbar"
+      [class.snackbar--success]="message.level === 'success'"
+      [class.snackbar--warning]="message.level === 'warning'"
+      [class.snackbar--error]="message.level === 'error'"
+      [class.snackbar--info]="message.level === 'info'"
+      role="status"
+      tabindex="0"
+      (click)="dismiss(message.id)"
+      (keydown.enter)="dismiss(message.id)"
+      (keydown.space)="dismiss(message.id); $event.preventDefault()"
+      title="Click to dismiss"
+    >
+      <span class="snackbar__text">{{ message.text }}</span>
+      <button
+        class="snackbar__dismiss"
+        type="button"
+        aria-label="Dismiss notification"
+        (click)="dismiss(message.id); $event.stopPropagation()"
+      >
+        ×
+      </button>
+    </div>
+  }
+</div>

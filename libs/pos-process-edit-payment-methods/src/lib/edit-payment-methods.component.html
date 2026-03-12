@@ -1,0 +1,272 @@
+<div class="card wide">
+  <h2>💳 Payment Methods Management</h2>
+
+  @if (error()) {
+    <div class="error">{{ error() }}</div>
+  }
+
+  <!-- Payment methods table -->
+  @if (loading()) {
+    <div class="loading">Loading payment methods…</div>
+  } @else {
+    <table class="pm-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Details</th>
+          <th>Auth Mode</th>
+          <th>Hardware</th>
+          <th>Device</th>
+          <th>Status</th>
+          <th>Preferred</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (pm of paymentMethods(); track pm.id) {
+          <tr>
+            @if (editingId() === pm.id) {
+              <td>
+                <input
+                  [(ngModel)]="editForm.name"
+                  name="name{{ pm.id }}"
+                  placeholder="Payment method name"
+                />
+              </td>
+              <td>{{ getTypeLabel(pm.type) }}</td>
+              <td>{{ getPaymentDetails(pm) }}</td>
+              <td>
+                @if (canConfigureAuthMode(pm.type)) {
+                  <select
+                    [(ngModel)]="editForm.authorizationMode"
+                    name="authMode{{ pm.id }}"
+                  >
+                    @for (mode of availableAuthModes; track mode) {
+                      <option [value]="mode">{{ mode }}</option>
+                    }
+                  </select>
+                } @else {
+                  <span class="readonly">{{
+                    editForm.authorizationMode || getDefaultAuthMode(pm.type)
+                  }}</span>
+                }
+              </td>
+              <td>
+                <input
+                  type="checkbox"
+                  [(ngModel)]="editForm.requiresHardware"
+                  name="hardware{{ pm.id }}"
+                />
+              </td>
+              <td>
+                @if (devicesForType(pm.type).length > 0) {
+                  <select
+                    [(ngModel)]="editForm.deviceId"
+                    name="device{{ pm.id }}"
+                  >
+                    <option [ngValue]="null">— None —</option>
+                    @for (dev of devicesForType(pm.type); track dev.id) {
+                      <option [ngValue]="dev.id">
+                        {{ dev.name }}
+                        @if (dev.managedByRemoteDeviceService) {
+                          ({{ dev.isOnline ? "online" : "offline" }})
+                        }
+                      </option>
+                    }
+                  </select>
+                } @else {
+                  <span class="readonly">N/A</span>
+                }
+              </td>
+              <td>
+                <select [(ngModel)]="editForm.status" name="status{{ pm.id }}">
+                  @for (status of availableStatuses; track status) {
+                    <option [value]="status">{{ status }}</option>
+                  }
+                </select>
+              </td>
+              <td>
+                <input
+                  type="checkbox"
+                  [(ngModel)]="editForm.isPreferred"
+                  name="preferred{{ pm.id }}"
+                />
+              </td>
+              <td class="actions">
+                <button class="btn btn--save" (click)="saveEdit(pm.id)">
+                  Save
+                </button>
+                <button class="btn btn--cancel" (click)="cancelEdit()">
+                  Cancel
+                </button>
+              </td>
+            } @else {
+              <td>{{ pm.name }}</td>
+              <td>{{ getTypeLabel(pm.type) }}</td>
+              <td class="details">{{ getPaymentDetails(pm) }}</td>
+              <td>
+                <span
+                  class="badge badge--auth"
+                  [class.badge--online]="
+                    (pm.authorizationMode || getDefaultAuthMode(pm.type)) ===
+                    'online'
+                  "
+                  [class.badge--offline]="
+                    (pm.authorizationMode || getDefaultAuthMode(pm.type)) ===
+                    'offline'
+                  "
+                >
+                  {{ pm.authorizationMode || getDefaultAuthMode(pm.type) }}
+                </span>
+              </td>
+              <td class="centered">
+                @if (pm.requiresHardware) {
+                  <span class="hardware-icon" title="Requires hardware">🖥️</span>
+                }
+              </td>
+              <td>
+                @if (pm.deviceId) {
+                  <span class="device-badge" [class.device-badge--online]="deviceOnline(pm.deviceId)">
+                    {{ deviceName(pm.deviceId) }}
+                  </span>
+                } @else if (devicesForType(pm.type).length > 0) {
+                  <span class="readonly">Not mapped</span>
+                } @else {
+                  <span class="readonly">—</span>
+                }
+              </td>
+              <td>
+                <span
+                  class="badge"
+                  [class.badge--active]="pm.status === 'active'"
+                  [class.badge--inactive]="pm.status === 'inactive'"
+                  [class.badge--suspended]="pm.status === 'suspended'"
+                  [class.badge--expired]="pm.status === 'expired'"
+                >
+                  {{ pm.status }}
+                </span>
+              </td>
+              <td>
+                @if (pm.isPreferred) {
+                  <span class="preferred">⭐</span>
+                }
+              </td>
+              <td class="actions">
+                <button class="btn btn--edit" (click)="startEdit(pm)">
+                  Edit
+                </button>
+                <button
+                  class="btn btn--delete"
+                  (click)="deletePaymentMethod(pm.id)"
+                >
+                  Delete
+                </button>
+              </td>
+            }
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+
+  <!-- Add payment method form -->
+  <details class="add-form">
+    <summary>➕ Add new payment method</summary>
+    <form (ngSubmit)="addPaymentMethod()" #af="ngForm">
+      <div class="form-row">
+        <label>
+          Name
+          <input
+            name="name"
+            [(ngModel)]="newPaymentMethod.name"
+            required
+            placeholder="e.g., Main Credit Card"
+          />
+        </label>
+        <label>
+          Description
+          <input
+            name="description"
+            [(ngModel)]="newPaymentMethod.description"
+            placeholder="Optional description"
+          />
+        </label>
+        <label>
+          Type
+          <select
+            name="type"
+            [(ngModel)]="newPaymentMethod.type"
+            (ngModelChange)="onTypeChange()"
+            required
+          >
+            @for (type of availableTypes; track type) {
+              <option [value]="type">{{ getTypeLabel(type) }}</option>
+            }
+          </select>
+        </label>
+      </div>
+      <div class="form-row">
+        <label>
+          Authorization Mode
+          <select
+            name="authMode"
+            [(ngModel)]="newPaymentMethod.authorizationMode"
+            [disabled]="!canConfigureAuthMode(newPaymentMethod.type)"
+            required
+          >
+            @for (mode of availableAuthModes; track mode) {
+              <option [value]="mode">{{ mode }}</option>
+            }
+          </select>
+          @if (!canConfigureAuthMode(newPaymentMethod.type)) {
+            <small class="hint"
+              >This payment type is {{
+                getDefaultAuthMode(newPaymentMethod.type)
+              }}-only</small
+            >
+          }
+        </label>
+        <label class="checkbox-label">
+          <input
+            type="checkbox"
+            name="requiresHardware"
+            [(ngModel)]="newPaymentMethod.requiresHardware"
+          />
+          <span>Requires hardware device</span>
+        </label>
+        @if (devicesForType(newPaymentMethod.type).length > 0) {
+          <label>
+            Device
+            <select name="deviceId" [(ngModel)]="newPaymentMethod.deviceId">
+              <option [ngValue]="undefined">— None —</option>
+              @for (dev of devicesForType(newPaymentMethod.type); track dev.id) {
+                <option [ngValue]="dev.id">
+                  {{ dev.name }}
+                  @if (dev.managedByRemoteDeviceService) {
+                    ({{ dev.isOnline ? "online" : "offline" }})
+                  }
+                </option>
+              }
+            </select>
+          </label>
+        }
+        <label class="checkbox-label">
+          <input
+            type="checkbox"
+            name="isPreferred"
+            [(ngModel)]="newPaymentMethod.isPreferred"
+          />
+          <span>Preferred method</span>
+        </label>
+      </div>
+      <button type="submit" [disabled]="saving() || !af.valid">
+        @if (saving()) {
+          Saving…
+        } @else {
+          Add payment method
+        }
+      </button>
+    </form>
+  </details>
+</div>

@@ -1,0 +1,34 @@
+<div class="payment-item">
+  <div class="payment-item__header">
+    <span class="payment-item__id">{{ payment.id }}</span>
+    <div class="payment-item__header-right">
+      <span class="payment-item__status" [class]="getStatusClass(payment.status)">
+        {{ payment.status || 'unknown' }}
+      </span>
+      @if (showTrashButton()) {
+        <button
+          type="button"
+          class="payment-item__trash-button"
+          (click)="onTrashClick()"
+          aria-label="Remove payment"
+        >
+          Trash
+        </button>
+      }
+    </div>
+  </div>
+  <div class="payment-item__details">
+    @if (payment.paymentMethod?.name) {
+      <span class="payment-item__method">{{ payment.paymentMethod?.name }}</span>
+    }
+    @if (payment.paymentDate) {
+      <span class="payment-item__date">{{ payment.paymentDate | date: 'short' }}</span>
+    }
+  </div>
+  @if (payment.description) {
+    <div class="payment-item__description">{{ payment.description }}</div>
+  }
+  <div class="payment-item__amount">
+    {{ formatAmount(payment.amount?.value || 0) }}
+  </div>
+</div>

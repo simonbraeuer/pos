@@ -3,7 +3,7 @@ import { FormsModule } from "@angular/forms";
 import { AuthStateService } from "./auth-state.service";
 
 @Component({
-  selector: "pos-login",
+  selector: "lib-login",
   standalone: true,
   imports: [FormsModule],
   template: `
@@ -30,7 +30,7 @@ import { AuthStateService } from "./auth-state.service";
           </button>
         </form>
 
-        <p class="hint">Demo&nbsp;accounts: <strong>admin / admin123</strong> &nbsp;or&nbsp; <strong>user / user123</strong></p>
+        <p class="hint">Demo&nbsp;accounts: <strong>admin / admin</strong> &nbsp;or&nbsp; <strong>kassier / kassier</strong></p>
       </div>
     </div>
   `,

@@ -1,0 +1,16 @@
+{
+  "name": "pos-process-new-cart",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/pos-process-new-cart/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "test": {
+      "executor": "@nx/vite:test",
+      "outputs": ["{projectRoot}/coverage"]
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}

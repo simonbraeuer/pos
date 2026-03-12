@@ -1,0 +1,20 @@
+{
+  "name": "cart-process-edit-sale-bundle-offer",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/cart-process-edit-sale-bundle-offer/src",
+  "prefix": "pos",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "test": {
+      "executor": "@nx/vitest:test",
+      "outputs": ["{options.reportsDirectory}"],
+      "options": {
+        "reportsDirectory": "../../coverage/libs/cart-process-edit-sale-bundle-offer"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}

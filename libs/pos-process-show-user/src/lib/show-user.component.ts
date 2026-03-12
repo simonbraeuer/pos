@@ -4,7 +4,7 @@ import { UserApiService } from "@pos/user";
 import type { PublicUser } from "@pos/auth";
 
 @Component({
-  selector: "pos-show-user",
+  selector: "lib-show-user",
   standalone: true,
   imports: [],
   template: `
