@@ -5,14 +5,34 @@ import { instrumentMockHarLogging } from '@pos/tmf688';
 import { HardwareStationApiService } from '@pos/hardware-station';
 import { CreateRegisterRequest, Register, UpdateRegisterRequest } from './models';
 
+
+// --- API Behaviour Config ---
+interface ApiBehaviourConfig {
+  latency: number;
+  errorRate: number;
+  failureStatus: number;
+}
+
+const API_BEHAVIOUR_KEY = 'pos_api_behaviour';
+function getApiBehaviour(): ApiBehaviourConfig {
+  try {
+    const raw = localStorage.getItem(API_BEHAVIOUR_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return { latency: 300, errorRate: 5, failureStatus: 503 };
+}
+
 function simulateLatency(): number {
-  return 120 + Math.random() * 480;
+  const { latency } = getApiBehaviour();
+  const jitter = latency * 0.3 * (Math.random() - 0.5) * 2;
+  return Math.max(0, Math.round(latency + jitter));
 }
 
 function maybeNetworkError(): Observable<never> | null {
-  if (Math.random() < 0.05) {
+  const { errorRate, failureStatus } = getApiBehaviour();
+  if (Math.random() < (errorRate / 100)) {
     const err = new Error('Register service temporarily unavailable') as Error & { status?: number };
-    err.status = 503;
+    err.status = failureStatus;
     return throwError(() => err);
   }
   return null;

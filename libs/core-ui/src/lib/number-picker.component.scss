@@ -1,0 +1,53 @@
+.pos-number-picker {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #cfd8dc;
+  border-radius: 0.5em;
+  background: #f8fafc;
+  box-shadow: 0 1px 4px rgba(30, 34, 62, 0.06);
+  padding: 0.1em 0.3em;
+  min-width: 7em;
+}
+
+.pos-number-picker__btn {
+  background: #e3eafc;
+  border: none;
+  color: #1a237e;
+  font-size: 1.3em;
+  width: 2em;
+  height: 2em;
+  border-radius: 0.4em;
+  cursor: pointer;
+  transition: background 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0.1em;
+}
+.pos-number-picker__btn:active {
+  background: #c5cae9;
+}
+.pos-number-picker__btn:disabled {
+  background: #eceff1;
+  color: #b0bec5;
+  cursor: not-allowed;
+}
+
+.pos-number-picker__input {
+  width: 3.5em;
+  text-align: center;
+  font-size: 1.1em;
+  border: none;
+  background: transparent;
+  color: #263238;
+  outline: none;
+  margin: 0 0.2em;
+}
+.pos-number-picker__input::-webkit-inner-spin-button,
+.pos-number-picker__input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.pos-number-picker__input[type=number] {
+  -moz-appearance: textfield;
+}

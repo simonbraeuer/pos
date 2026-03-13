@@ -1,0 +1,59 @@
+<lib-process-content-layout
+    icon="🛠️"
+    title="Shop Maintenance"
+    [showAbort]="true"
+    (abort)="onAbort()"
+>
+    <div slot="content">
+        <p>Hidden store controls for resetting persisted demo data, browser-held POS state, and API mock behaviour.</p>
+
+        @if (maintenanceError) {
+            <p class="shop-menu-panel__error">{{ maintenanceError }}</p>
+        }
+
+        <div class="shop-action-card">
+            <pos-api-behaviour-config
+                [apiBehaviour]="apiBehaviour"
+                (apiBehaviourChange)="onApiBehaviourChange($event)"
+            ></pos-api-behaviour-config>
+        </div>
+
+        <div class="shop-action-card">
+            <div class="shop-action-card__text">
+                <h3>Reset IndexedDB Databases</h3>
+                <p>
+                    Deletes persisted carts, product orders, payments, catalog data, device/location/register/shift data,
+                    and mock identity data stored in IndexedDB. The next app use recreates seeded demo databases, so in-progress
+                    transactional state is lost.
+                </p>
+            </div>
+            <button
+                type="button"
+                class="shop-action-card__button shop-action-card__button--danger"
+                [disabled]="!!maintenanceBusy"
+                (click)="resetIndexedDb()"
+            >
+                @if (maintenanceBusy === 'db') { Resetting... } @else { Reset Databases }
+            </button>
+        </div>
+
+        <div class="shop-action-card">
+            <div class="shop-action-card__text">
+                <h3>Clear POS Local Storage</h3>
+                <p>
+                    Removes the saved login token, current cart pointer, tablet and shift context, receipt preferences,
+                    and mock TMF691 session records stored in local storage. After reload, the user must sign in again and
+                    reselect shop context.
+                </p>
+            </div>
+            <button
+                type="button"
+                class="shop-action-card__button shop-action-card__button--warning"
+                [disabled]="!!maintenanceBusy"
+                (click)="clearLocalStorageRecords()"
+            >
+                @if (maintenanceBusy === 'storage') { Clearing... } @else { Clear Local Storage }
+            </button>
+        </div>
+    </div>
+</lib-process-content-layout>

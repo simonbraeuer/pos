@@ -1,0 +1,32 @@
+{
+  "name": "pos-process-configure-demo",
+  "root": "libs/pos-process-configure-demo",
+  "sourceRoot": "libs/pos-process-configure-demo/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/angular:ng-packagr-lite",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/pos-process-configure-demo",
+        "tsConfig": "libs/pos-process-configure-demo/tsconfig.lib.json",
+        "project": "libs/pos-process-configure-demo/ng-package.json"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "lintFilePatterns": ["libs/pos-process-configure-demo/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "jestConfig": "libs/pos-process-configure-demo/jest.config.ts",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}

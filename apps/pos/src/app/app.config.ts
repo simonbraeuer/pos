@@ -84,7 +84,8 @@ export const appConfig: ApplicationConfig = {
         registry.register({ id: "tablet-selection", label: "Select Tablet", icon: "📱", route: "/tablet-selection" });
         registry.register({ id: "edit-users",       label: "Manage Users",  icon: "👥", route: "/edit-users", adminOnly: true });
         registry.register({ id: "edit-product-catalog", label: "Manage Products", icon: "📦", route: "/edit-product-catalog", adminOnly: true });
-          registry.register({ id: "edit-payment-methods", label: "Manage Payment Methods", icon: "💳", route: "/edit-payment-methods", adminOnly: true });
+        registry.register({ id: "edit-payment-methods", label: "Manage Payment Methods", icon: "💳", route: "/edit-payment-methods", adminOnly: true });
+        registry.register({ id: "configure-demo", label: "Configure Demo", icon: "🛠️", route: "/configure-demo", adminOnly: true });
       },
       deps: [MenuRegistryService],
       multi: true,

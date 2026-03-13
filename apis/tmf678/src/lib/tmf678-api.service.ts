@@ -12,9 +12,27 @@ import {
   Money,
 } from './models';
 
-/** Simulates realistic API network latency (150–800 ms). */
+
+// --- API Behaviour Config ---
+interface ApiBehaviourConfig {
+  latency: number;
+  errorRate: number;
+  failureStatus: number;
+}
+
+const API_BEHAVIOUR_KEY = 'pos_api_behaviour';
+function getApiBehaviour(): ApiBehaviourConfig {
+  try {
+    const raw = localStorage.getItem(API_BEHAVIOUR_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return { latency: 300, errorRate: 5, failureStatus: 503 };
+}
+
 function simulateLatency(): number {
-  return 150 + Math.random() * 650;
+  const { latency } = getApiBehaviour();
+  const jitter = latency * 0.3 * (Math.random() - 0.5) * 2;
+  return Math.max(0, Math.round(latency + jitter));
 }
 
 type HttpLikeError = Error & { status?: number };
@@ -25,10 +43,10 @@ function createHttpLikeError(message: string, status: number): HttpLikeError {
   return err;
 }
 
-/** Randomly reject ~5% of requests to simulate transient failures. */
 function maybeNetworkError(): Observable<never> | null {
-  if (Math.random() < 0.05) {
-    return throwError(() => createHttpLikeError('Customer Bill service temporarily unavailable', 503));
+  const { errorRate, failureStatus } = getApiBehaviour();
+  if (Math.random() < (errorRate / 100)) {
+    return throwError(() => createHttpLikeError('Customer Bill service temporarily unavailable', failureStatus));
   }
   return null;
 }

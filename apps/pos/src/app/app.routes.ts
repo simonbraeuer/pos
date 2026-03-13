@@ -79,6 +79,12 @@ export const appRoutes: Routes = [
         resolve: { cart: cartResolver },
         children: CART_PROCESS_ROUTES,
       },
+      {
+        path: "configure-demo",
+        loadComponent: () =>
+          import("@pos/pos-process-configure-demo").then(m => m.PosProcessConfigureDemoComponent),
+        canActivate: [adminGuard],
+      },
     ],
   },
   { path: "**", redirectTo: "" },

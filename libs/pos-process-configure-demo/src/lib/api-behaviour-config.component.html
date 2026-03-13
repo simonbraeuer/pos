@@ -1,0 +1,36 @@
+<div class="shop-action-card__text">
+  <h3 class="shop-action-card__title">API - behaviour</h3>
+  <p class="shop-action-card__desc">
+    Configure mock API behaviour for all backend simulations. Changes are stored in local storage and used by all API mocks.
+  </p>
+  <form class="api-behaviour-form" (submit)="$event.preventDefault()">
+    <pos-slider
+      label="Latency (ms)"
+      [min]="0"
+      [max]="5000"
+      [step]="10"
+      [value]="apiBehaviour.latency"
+      id="latency-slider"
+      (valueChange)="apiBehaviour.latency = $event; onInputChange()"
+    ></pos-slider>
+    <label style="display: flex; align-items: center; gap: 0.7em;">
+      Error Rate (%)
+      <pos-number-picker
+        [value]="apiBehaviour.errorRate"
+        [min]="0"
+        [max]="100"
+        [step]="1"
+        (valueChange)="apiBehaviour.errorRate = $event; onInputChange()"
+      ></pos-number-picker>
+    </label>
+    <label>
+      Failure Status:
+      <select [(ngModel)]="apiBehaviour.failureStatus" name="failureStatus" (ngModelChange)="onInputChange()">
+        <option value="503">503 Service Unavailable</option>
+        <option value="500">500 Internal Server Error</option>
+        <option value="400">400 Bad Request</option>
+      </select>
+    </label>
+    <!-- No save button, changes are applied immediately -->
+  </form>
+</div>

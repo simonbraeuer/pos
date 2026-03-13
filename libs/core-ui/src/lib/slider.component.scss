@@ -1,0 +1,46 @@
+.pos-slider__label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.98rem;
+  color: #1a237e;
+  margin-bottom: 0.5rem;
+}
+.pos-slider__input {
+  width: 100%;
+  accent-color: #1a237e;
+  margin: 0.2rem 0;
+}
+.pos-slider__scale {
+  position: relative;
+  height: 1.2em;
+  margin-top: -0.2em;
+  width: 100%;
+}
+.pos-slider__tick {
+  position: absolute;
+  top: 0;
+  font-size: 1.1em;
+  color: #bfc7e3;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.pos-slider__tick-label {
+  position: absolute;
+  top: 1em;
+  font-size: 0.95em;
+  color: #222;
+  background: #fffbe7;
+  border: 1px solid #ffe082;
+  border-radius: 0.5em;
+  padding: 0.1em 0.5em;
+  margin-left: 0.1em;
+  margin-right: 0.1em;
+  transform: translateX(-50%);
+  pointer-events: none;
+  white-space: nowrap;
+  min-width: 2.5em;
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(255, 224, 130, 0.15);
+  z-index: 2;
+}

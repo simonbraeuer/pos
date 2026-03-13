@@ -5,3 +5,5 @@ export * from './lib/dialog-outlet.component';
 export * from './lib/process-content-layout.component';
 export * from './lib/action-button.component';
 export * from './lib/action-button-panel.component';
+export * from './lib/slider.component';
+export * from './lib/number-picker.component';

@@ -22,16 +22,35 @@ import {
 
 const TMF691_SESSIONS_STORAGE_KEY = 'pos_tmf691_sessions';
 
-/** Simulates realistic API network latency (100–500 ms). */
-function simulateLatency(): number {
-  return 100 + Math.random() * 400;
+
+// --- API Behaviour Config ---
+interface ApiBehaviourConfig {
+  latency: number;
+  errorRate: number;
+  failureStatus: number;
 }
 
-/** Randomly reject ~3% of requests to simulate transient failures. */
+const API_BEHAVIOUR_KEY = 'pos_api_behaviour';
+function getApiBehaviour(): ApiBehaviourConfig {
+  try {
+    const raw = localStorage.getItem(API_BEHAVIOUR_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return { latency: 300, errorRate: 5, failureStatus: 503 };
+}
+
+function simulateLatency(): number {
+  const { latency } = getApiBehaviour();
+  // Add jitter: ±30%
+  const jitter = latency * 0.3 * (Math.random() - 0.5) * 2;
+  return Math.max(0, Math.round(latency + jitter));
+}
+
 function maybeNetworkError(): Observable<never> | null {
-  if (Math.random() < 0.03) {
+  const { errorRate, failureStatus } = getApiBehaviour();
+  if (Math.random() < (errorRate / 100)) {
     const err = new Error('Federated Identity service temporarily unavailable') as any;
-    err.status = 503;
+    err.status = failureStatus;
     return throwError(() => err);
   }
   return null;

@@ -1,4 +1,7 @@
+import { SHOP_MAINTENANCE_MENU_API, ShopMaintenanceMenuApi } from '@pos/pos-process-configure-demo';
 import { Component, HostListener, OnInit, inject, signal } from "@angular/core";
+import { FormsModule } from '@angular/forms';
+import { inject as ngInject, Provider } from '@angular/core';
 import { RouterOutlet, RouterLink } from "@angular/router";
 import { MenuRegistryService } from "./menu-registry.service";
 import { BurgerMenuService } from "./burger-menu.service";
@@ -33,181 +36,52 @@ const SHOP_LOCAL_STORAGE_KEYS = [
   "pos_tmf691_sessions",
 ];
 
+const API_BEHAVIOUR_KEY = 'pos_api_behaviour';
+
+export interface ApiBehaviourConfig {
+  latency: number;
+  errorRate: number;
+  failureStatus: number;
+}
+
 @Component({
   selector: "lib-shell",
   standalone: true,
-  imports: [RouterOutlet, RouterLink],
-  template: `
-    <header class="topbar">
-      <button class="burger-menu-button" (click)="burgerMenu.toggle()" aria-label="Menu">
-        <span class="burger-icon">☰</span>
-      </button>
-
-      <div
-        class="topbar__brand"
-        role="button"
-        tabindex="0"
-        (click)="toggleShopMenu()"
-        (keydown.enter)="toggleShopMenu()"
-        (keydown.space)="toggleShopMenu(); $event.preventDefault()"
-      >
-        <img class="topbar__logo" src="favicon.svg" alt="" aria-hidden="true" />
-        <span class="topbar__title">POS</span>
-      </div>
-
-      <div class="topbar__tablet" [class.topbar__tablet--missing]="!tabletSelection.selectedTablet()">
-        @if (tabletSelection.selectedTablet(); as tablet) {
-          <span class="tablet-label">Tablet</span>
-          <span class="tablet-value">{{ tablet.deviceName }}</span>
-          <span class="tablet-location">{{ tablet.locationName }}</span>
-        } @else {
-          <span class="tablet-label">Tablet</span>
-          <a class="tablet-link" [routerLink]="'/tablet-selection'">Not selected</a>
-        }
-      </div>
-
-      <div class="topbar__cart" [class.topbar__cart--empty]="!currentCart.currentCartId()">
-        <span class="cart-label">Cart</span>
-        @if (currentCart.currentCartId(); as cartId) {
-          <a class="cart-link" [routerLink]="['/cart', cartId, 'find-sale-offer']">{{ cartId }}</a>
-        } @else {
-          <span class="cart-value">None</span>
-        }
-      </div>
-
-      <div
-        class="topbar__user"
-        role="button"
-        tabindex="0"
-        (click)="toggleMenu()"
-        (keydown.enter)="toggleMenu()"
-        (keydown.space)="toggleMenu(); $event.preventDefault()"
-      >
-        <span class="user-avatar">{{ initials() }}</span>
-        <span class="user-info">
-          <span class="user-name">{{ auth.currentUser()?.displayName }}</span>
-          <span class="user-role">{{ auth.currentUser()?.role }}</span>
-        </span>
-        <span class="user-caret">{{ menuOpen() ? "▲" : "▼" }}</span>
-
-        @if (menuOpen()) {
-          <div class="user-menu" (mousedown)="$event.stopPropagation()">
-            @for (item of visibleItems(); track item.id) {
-              <a class="user-menu__item" [routerLink]="item.route" (click)="toggleMenu()">
-                {{ item.icon }} {{ item.label }}
-              </a>
-            }
-            <div class="user-menu__divider"></div>
-            <button class="user-menu__item user-menu__logout" (click)="logout()">
-              🚪 Sign out
-            </button>
-          </div>
-        }
-      </div>
-    </header>
-
-    <main class="main-content">
-      <router-outlet />
-    </main>
-
-    @if (shopMenuOpen()) {
-      <div
-        class="shop-menu-overlay"
-        role="button"
-        tabindex="0"
-        (click)="closeShopMenu()"
-        (keydown.enter)="closeShopMenu()"
-        (keydown.space)="closeShopMenu(); $event.preventDefault()"
-      >
-        <section class="shop-menu-panel" (click)="$event.stopPropagation()" (mousedown)="$event.stopPropagation()">
-          <div class="shop-menu-panel__header">
-            <div>
-              <h2>Shop Maintenance</h2>
-              <p>Hidden store controls for resetting persisted demo data and browser-held POS state.</p>
-            </div>
-            <button type="button" class="shop-menu-panel__close" (click)="closeShopMenu()" aria-label="Close shop menu">
-              ✕
-            </button>
-          </div>
-
-          @if (maintenanceError()) {
-            <p class="shop-menu-panel__error">{{ maintenanceError() }}</p>
-          }
-
-          <div class="shop-action-card">
-            <div class="shop-action-card__text">
-              <h3>Reset IndexedDB Databases</h3>
-              <p>
-                Deletes persisted carts, product orders, payments, catalog data, device/location/register/shift data,
-                and mock identity data stored in IndexedDB. The next app use recreates seeded demo databases, so in-progress
-                transactional state is lost.
-              </p>
-            </div>
-            <button
-              type="button"
-              class="shop-action-card__button shop-action-card__button--danger"
-              [disabled]="!!maintenanceBusy()"
-              (click)="resetIndexedDb()"
-            >
-              @if (maintenanceBusy() === 'db') { Resetting... } @else { Reset Databases }
-            </button>
-          </div>
-
-          <div class="shop-action-card">
-            <div class="shop-action-card__text">
-              <h3>Clear POS Local Storage</h3>
-              <p>
-                Removes the saved login token, current cart pointer, tablet and shift context, receipt preferences,
-                and mock TMF691 session records stored in local storage. After reload, the user must sign in again and
-                reselect shop context.
-              </p>
-            </div>
-            <button
-              type="button"
-              class="shop-action-card__button shop-action-card__button--warning"
-              [disabled]="!!maintenanceBusy()"
-              (click)="clearLocalStorageRecords()"
-            >
-              @if (maintenanceBusy() === 'storage') { Clearing... } @else { Clear Local Storage }
-            </button>
-          </div>
-        </section>
-      </div>
-    }
-
-    @if (burgerMenu.isOpen()) {
-      <div
-        class="burger-menu-overlay"
-        role="button"
-        tabindex="0"
-        (click)="burgerMenu.close()"
-        (keydown.enter)="burgerMenu.close()"
-        (keydown.space)="burgerMenu.close(); $event.preventDefault()"
-      >
-        <div class="burger-menu" (mousedown)="$event.stopPropagation()">
-          <div class="burger-menu__header">
-            <h2>Menu</h2>
-            <button class="burger-menu__close" (click)="burgerMenu.close()" aria-label="Close menu">
-              ✕
-            </button>
-          </div>
-          <nav class="burger-menu__items">
-            @for (item of burgerMenu.items(); track item.id) {
-              <button class="burger-menu__item" (click)="handleBurgerItemClick(item)">
-                @if (item.icon) {
-                  <span class="burger-menu__item-icon">{{ item.icon }}</span>
-                }
-                {{ item.name }}
-              </button>
-            }
-          </nav>
-        </div>
-      </div>
-    }
-  `,
-  styleUrl: "./shell.component.scss",
+  imports: [RouterOutlet, RouterLink, FormsModule],
+  templateUrl: './shell.component.html',
+  styleUrl: "./shell.component.scss"
 })
-export class ShellComponent implements OnInit {
+export class ShellComponent implements OnInit, ShopMaintenanceMenuApi {
+    apiBehaviour: ApiBehaviourConfig = this.loadApiBehaviour();
+
+    loadApiBehaviour(): ApiBehaviourConfig {
+      try {
+        const raw = localStorage.getItem(API_BEHAVIOUR_KEY);
+        if (raw) {
+          return JSON.parse(raw);
+        }
+      } catch {}
+      return { latency: 300, errorRate: 5, failureStatus: 503 };
+    }
+
+    onApiBehaviourChange(newConfig: ApiBehaviourConfig): void {
+      this.setApiBehaviour(newConfig);
+    }
+
+    // ShopMaintenanceMenuApi implementation
+    getApiBehaviour() {
+      return this.apiBehaviour;
+    }
+    setApiBehaviour(config: ApiBehaviourConfig) {
+      this.apiBehaviour = { ...config };
+      localStorage.setItem(API_BEHAVIOUR_KEY, JSON.stringify(this.apiBehaviour));
+    }
+    getMaintenanceError() {
+      return this.maintenanceError();
+    }
+    getMaintenanceBusy() {
+      return this.maintenanceBusy();
+    }
   auth       = inject(AuthStateService);
   registry   = inject(MenuRegistryService);
   burgerMenu = inject(BurgerMenuService);

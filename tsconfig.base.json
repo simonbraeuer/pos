@@ -97,7 +97,11 @@
       ],
       "@pos/pos-process-edit-cart-customer": [
         "libs/pos-process-edit-cart-customer/src/index.ts"
+      ],
+      "@pos/pos-process-configure-demo": [
+        "libs/pos-process-configure-demo/src/index.ts"
       ]
+      // @pos/api-behaviour-config mapping removed
 
     }
   },
