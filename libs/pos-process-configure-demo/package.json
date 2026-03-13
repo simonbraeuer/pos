@@ -1,0 +1,13 @@
+{
+  "name": "@pos/pos-process-configure-demo",
+  "version": "0.0.1",
+  "peerDependencies": {
+    "@angular/core": "^16.0.0 || ^17.0.0 || ^18.0.0 || ^21.0.0",
+    "@angular/common": "^16.0.0 || ^17.0.0 || ^18.0.0 || ^21.0.0"
+  },
+  "ngPackage": {
+    "lib": {
+      "entryFile": "src/index.ts"
+    }
+  }
+}
