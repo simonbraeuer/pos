@@ -28,6 +28,7 @@ import {
 import { providePendingPaymentDefaultOverlay } from "@pos/pending-payment-default";
 import { providePendingRefundDefaultOverlay } from "@pos/pending-refund-default";
 
+export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(appRoutes, withComponentInputBinding(), withHashLocation()),
