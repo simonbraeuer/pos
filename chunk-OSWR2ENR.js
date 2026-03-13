@@ -1,1 +1,0 @@
-import{a,b}from"./chunk-L6X2757A.js";import"./chunk-ORBFYMAR.js";import"./chunk-F3VNLU7S.js";import"./chunk-5JLVMR5J.js";import"./chunk-TCO5LAXU.js";import"./chunk-UKMI5IEC.js";import"./chunk-RHJY64CW.js";import"./chunk-CAQPTSUG.js";import"./chunk-5HMRI4WU.js";export{a as OrdersComponent,b as provideOrdersMenu};

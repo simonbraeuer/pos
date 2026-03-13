@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title>POS THE Money Icon</title>
+  <desc>Elegant gold THE lettering styled like currency symbols on a deep blue circular badge.</desc>
+  <defs>
+    <radialGradient id="bg" cx="35%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#2d5bff" />
+      <stop offset="100%" stop-color="#132a73" />
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fff2a8" />
+      <stop offset="55%" stop-color="#f3c94e" />
+      <stop offset="100%" stop-color="#b97a10" />
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="28" fill="url(#bg)" />
+  <circle cx="32" cy="32" r="24" fill="none" stroke="#7aa2ff" stroke-width="1.5" opacity=".35" />
+  <g fill="url(#gold)">
+    <path d="M10.5 16h27v5.2h-10V47h-6V21.2H10.5z" />
+    <path d="M35.8 24.6h3.6v6.3h5.4v-6.3h3.6V41h-3.6v-6.7h-5.4V41h-3.6z" />
+    <path d="M49.2 24.6H59v3.2h-6.2V31h5.4v3.1h-5.4v3.6H59V41h-9.8z" />
+  </g>
+  <g stroke="#fff6d6" stroke-width="1.25" stroke-linecap="round" opacity=".58">
+    <path d="M24.6 14.6v34.8" />
+    <path d="M37.6 23.4v18.7" />
+    <path d="M46.9 30.9h7.9" />
+    <path d="M50.4 23.4v18.7" />
+    <path d="M50.4 32.8h6.9" />
+    <path d="M50.4 39.2h7.1" />
+  </g>
+</svg>
