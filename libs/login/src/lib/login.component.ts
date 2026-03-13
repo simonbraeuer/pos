@@ -9,7 +9,10 @@ import { AuthStateService } from "./auth-state.service";
   template: `
     <div class="login-page">
       <div class="login-card">
-        <div class="logo">🏪 POS</div>
+        <div class="logo">
+          <img class="logo__icon" src="favicon.svg" alt="" aria-hidden="true" />
+          <span>POS</span>
+        </div>
         <h1>Sign in</h1>
 
         @if (auth.error()) {

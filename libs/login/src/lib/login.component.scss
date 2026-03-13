@@ -15,7 +15,23 @@
   box-shadow: 0 8px 32px rgba(0,0,0,.24);
   text-align: center;
 
-  .logo { font-size: 2.5rem; margin-bottom: .5rem; }
+  .logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .6rem;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a237e;
+    margin-bottom: .5rem;
+  }
+
+  .logo__icon {
+    width: 40px;
+    height: 40px;
+    display: block;
+    flex-shrink: 0;
+  }
 
   h1 { margin: 0 0 1.5rem; font-size: 1.4rem; color: #1a237e; }
 

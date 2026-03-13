@@ -201,6 +201,27 @@ export class IdbService {
     );
   }
 
+  closeAll(): void {
+    for (const db of this.dbByName.values()) {
+      db.close();
+    }
+    this.dbByName.clear();
+    this.initPromises.clear();
+  }
+
+  async deleteDatabases(dbNames: string[]): Promise<void> {
+    this.closeAll();
+
+    for (const dbName of dbNames) {
+      await new Promise<void>((resolve, reject) => {
+        const request = indexedDB.deleteDatabase(dbName);
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error ?? new Error(`Failed to delete database '${dbName}'.`));
+        request.onblocked = () => reject(new Error(`Deletion of database '${dbName}' was blocked.`));
+      });
+    }
+  }
+
   /**
    * Helper method to ensure DB is initialized before operations.
    */
