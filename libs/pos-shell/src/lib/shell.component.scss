@@ -96,6 +96,49 @@
   text-decoration: underline;
 }
 
+.topbar__cart {
+  padding: .22rem .6rem;
+  border: 1px solid rgba(255,255,255,.24);
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+  background: rgba(255,255,255,.08);
+  min-width: 0;
+
+  &--empty {
+    border-color: rgba(255,255,255,.14);
+    background: rgba(255,255,255,.05);
+  }
+}
+
+.cart-label {
+  font-size: .66rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.72);
+}
+
+.cart-link,
+.cart-value {
+  font-size: .82rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.cart-link {
+  color: #fff;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.cart-value {
+  color: rgba(255,255,255,.68);
+}
+
 /* ── User badge ─────────────────────────────────────────── */
 .topbar__user {
   position: relative;

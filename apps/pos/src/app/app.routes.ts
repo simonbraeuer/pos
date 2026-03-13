@@ -1,5 +1,6 @@
 /* eslint-disable @nx/enforce-module-boundaries */
 import { Routes } from "@angular/router";
+import { CurrentCartRedirectComponent } from "./current-cart-redirect.component";
 import { ShellComponent } from "@pos/pos-shell";
 import { LoginComponent } from "@pos/login";
 import { authGuard, adminGuard, loginGuard } from "@pos/login";
@@ -20,7 +21,7 @@ export const appRoutes: Routes = [
         loadComponent: () =>
           import("@pos/tablet-selection").then(m => m.TabletSelectionComponent),
       },
-      { path: "", redirectTo: "new-cart", pathMatch: "full" },
+      { path: "", component: CurrentCartRedirectComponent, pathMatch: "full" },
       {
         path: "show-user",
         loadComponent: () =>

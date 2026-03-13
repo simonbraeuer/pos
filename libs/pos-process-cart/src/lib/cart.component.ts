@@ -2,7 +2,7 @@ import { Component, HostListener, Input, OnInit, OnDestroy, inject, signal } fro
 import { CommonModule } from "@angular/common";
 import { NavigationEnd, Router } from '@angular/router';
 import { ShoppingCart, CartItem, CartEvent, Tmf663ApiService, Tmf688EventService } from "@pos/tmf663";
-import { CART_POSITION_SELECTION_HANDLERS, CartPositionSelectionHandler, CartValidationService } from "@pos/cart-core";
+import { CART_POSITION_SELECTION_HANDLERS, CartValidationService, CurrentCartStateService } from "@pos/cart-core";
 import { CreateProductOrderRequest, OrderPrice, Tmf622ApiService } from "@pos/tmf622";
 import { AuthStateService } from '@pos/login';
 import { Subject } from 'rxjs';
@@ -211,6 +211,7 @@ export class CartComponent implements OnInit, OnDestroy {
   private readonly orderApi = inject(Tmf622ApiService);
   private readonly eventService = inject(Tmf688EventService);
   private readonly cartValidation = inject(CartValidationService);
+  private readonly currentCart = inject(CurrentCartStateService);
   private readonly router = inject(Router);
   private readonly dialog = inject(DialogService);
   private readonly auth = inject(AuthStateService);
@@ -239,6 +240,7 @@ export class CartComponent implements OnInit, OnDestroy {
     // Initialize with the input cart
     if (this.cart) {
       this.cartSignal.set(this.cart);
+      this.currentCart.setCurrentCartId(this.cart.id);
       this.validateCart(this.cart.id);
     }
 
@@ -272,6 +274,7 @@ export class CartComponent implements OnInit, OnDestroy {
           this.cartSignal.set(event.cart);
           // Also update the input property so parent component is aware
           this.cart = event.cart;
+          this.currentCart.setCurrentCartId(event.cart.id);
           this.validateCart(event.cart.id);
         }
       });
@@ -378,7 +381,14 @@ export class CartComponent implements OnInit, OnDestroy {
     this.deleting.set(itemId);
     this.error.set(null);
 
-    this.api.deleteCartItem(this.cartSignal()!.id, itemId).subscribe({
+    const cart = this.cartSignal();
+    if (!cart) {
+      this.deleting.set(null);
+      this.error.set('Failed to delete item: cart is not available.');
+      return;
+    }
+
+    this.api.deleteCartItem(cart.id, itemId).subscribe({
       next: () => {
         this.deleting.set(null);
       },

@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, signal } from "@angular/core";
 import { Router } from "@angular/router";
+import { CurrentCartStateService } from "@pos/cart-core";
 import { Tmf663ApiService } from "@pos/tmf663";
 
 @Component({
@@ -52,6 +53,7 @@ import { Tmf663ApiService } from "@pos/tmf663";
 })
 export class NewCartComponent implements OnInit {
   private readonly api = inject(Tmf663ApiService);
+  private readonly currentCart = inject(CurrentCartStateService);
   private readonly router = inject(Router);
 
   creating = signal(false);
@@ -68,10 +70,12 @@ export class NewCartComponent implements OnInit {
   private createAndNavigate(): void {
     this.creating.set(true);
     this.error.set(null);
+    this.currentCart.clearCurrentCart();
 
     this.api.createCart({}).subscribe({
       next: (cart) => {
         this.creating.set(false);
+        this.currentCart.setCurrentCartId(cart.id);
         this.router.navigate(['/cart', cart.id, 'find-sale-offer']);
       },
       error: (err) => {

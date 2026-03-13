@@ -8,6 +8,7 @@ import { LocationApiService } from '@pos/location';
 import { DeviceApiService } from '@pos/device';
 import { ShiftApiService } from '@pos/shift';
 import { RegisterApiService } from '@pos/register';
+import { CurrentCartStateService } from '@pos/cart-core';
 import { OrderCompleteComponent } from './order-complete.component';
 
 @Component({
@@ -190,6 +191,7 @@ export class OrderProcessCheckoutCompleteComponent {
   private readonly deviceApi = inject(DeviceApiService);
   private readonly shiftApi = inject(ShiftApiService);
   private readonly registerApi = inject(RegisterApiService);
+  private readonly currentCart = inject(CurrentCartStateService);
 
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
@@ -236,6 +238,8 @@ export class OrderProcessCheckoutCompleteComponent {
   });
 
   constructor() {
+    this.currentCart.clearCurrentCart();
+
     effect((onCleanup) => {
       const orderId = this.orderId();
       if (!orderId) {

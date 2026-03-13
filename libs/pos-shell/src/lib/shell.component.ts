@@ -1,9 +1,10 @@
-import { Component, OnInit, inject, signal } from "@angular/core";
+import { Component, HostListener, OnInit, inject, signal } from "@angular/core";
 import { RouterOutlet, RouterLink } from "@angular/router";
 import { MenuRegistryService } from "./menu-registry.service";
 import { BurgerMenuService } from "./burger-menu.service";
 import { AuthStateService } from "@pos/login";
 import { TabletSelectionStateService } from "@pos/tablet-selection";
+import { CurrentCartStateService } from "@pos/cart-core";
 
 @Component({
   selector: "lib-shell",
@@ -28,6 +29,15 @@ import { TabletSelectionStateService } from "@pos/tablet-selection";
         } @else {
           <span class="tablet-label">Tablet</span>
           <a class="tablet-link" [routerLink]="'/tablet-selection'">Not selected</a>
+        }
+      </div>
+
+      <div class="topbar__cart" [class.topbar__cart--empty]="!currentCart.currentCartId()">
+        <span class="cart-label">Cart</span>
+        @if (currentCart.currentCartId(); as cartId) {
+          <a class="cart-link" [routerLink]="['/cart', cartId, 'find-sale-offer']">{{ cartId }}</a>
+        } @else {
+          <span class="cart-value">None</span>
         }
       </div>
 
@@ -103,6 +113,7 @@ export class ShellComponent implements OnInit {
   registry   = inject(MenuRegistryService);
   burgerMenu = inject(BurgerMenuService);
   tabletSelection = inject(TabletSelectionStateService);
+  currentCart = inject(CurrentCartStateService);
 
   menuOpen = signal(false);
 
@@ -121,6 +132,20 @@ export class ShellComponent implements OnInit {
   initials(): string {
     const name = this.auth.currentUser()?.displayName ?? "?";
     return name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+  }
+
+  @HostListener("document:mousedown", ["$event"])
+  handleDocumentMouseDown(event: MouseEvent): void {
+    if (!this.menuOpen()) {
+      return;
+    }
+
+    const target = event.target;
+    if (!(target instanceof Element) || target.closest(".topbar__user")) {
+      return;
+    }
+
+    this.menuOpen.set(false);
   }
 
   toggleMenu(): void { this.menuOpen.update(v => !v); }
