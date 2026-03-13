@@ -1,6 +1,6 @@
 /* eslint-disable @nx/enforce-module-boundaries */
 import { ApplicationConfig, provideZoneChangeDetection, APP_INITIALIZER } from "@angular/core";
-import { provideRouter, withComponentInputBinding } from "@angular/router";
+import { provideRouter, withComponentInputBinding, withHashLocation } from "@angular/router";
 
 import { appRoutes } from "./app.routes";
 import { AuthStateService } from "@pos/login";
@@ -28,10 +28,9 @@ import {
 import { providePendingPaymentDefaultOverlay } from "@pos/pending-payment-default";
 import { providePendingRefundDefaultOverlay } from "@pos/pending-refund-default";
 
-export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(appRoutes, withComponentInputBinding()),
+    provideRouter(appRoutes, withComponentInputBinding(), withHashLocation()),
 
     // Burger menu providers
     ...provideSearchCartMenu(),
