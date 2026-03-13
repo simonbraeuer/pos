@@ -896,6 +896,47 @@ export class Tmf622ApiService implements OnInit {
   }
 
   /**
+   * Atomically update `returnedQuantity` on a specific order item.
+   * Pass +1 when a return cart position is added, -1 when one is removed (edit/undo).
+   * The value is clamped to [0, item.quantity].
+   */
+  recordOrderItemReturn(orderId: string, itemId: string, delta: number): Observable<void> {
+    return new Observable((subscriber) => {
+      (async () => {
+        try {
+          await this.ensureInitialized();
+
+          let order: ProductOrder;
+          try {
+            order = await firstValueFrom(this.idb.get<ProductOrder>(STORE_NAME, orderId));
+          } catch {
+            subscriber.error(new Error(`Product order ${orderId} not found`));
+            return;
+          }
+
+          const updatedItems = order.productOrderItem.map((item) => {
+            if (item.id !== itemId) return item;
+            const current = item.returnedQuantity ?? 0;
+            return {
+              ...item,
+              returnedQuantity: Math.max(0, Math.min(item.quantity, current + delta)),
+            };
+          });
+
+          const updatedOrder: ProductOrder = { ...order, productOrderItem: updatedItems };
+          await firstValueFrom(this.idb.put(STORE_NAME, updatedOrder));
+          this.cacheOrder(updatedOrder);
+
+          subscriber.next(undefined);
+          subscriber.complete();
+        } catch (error) {
+          subscriber.error(error);
+        }
+      })();
+    });
+  }
+
+  /**
    * Calculate total order price from order items
    * @private
    */

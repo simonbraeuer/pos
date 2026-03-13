@@ -1,15 +1,17 @@
 <lib-process-content-layout
   icon="💵"
-  title="Cash Payment"
+  [title]="isRefundMode() ? 'Cash Refund' : 'Cash Payment'"
   [showAbort]="true"
   (abort)="goBack()"
 >
   <div slot="content" class="payment-form">
     <div class="form-group">
       <label for="amount" class="form-label">
-        Payment Amount
-        @if (outstandingAmount() > 0) {
-          <span class="form-label__hint">(Outstanding: {{ formatAmount(outstandingAmount()) }})</span>
+        {{ isRefundMode() ? 'Refund Amount' : 'Payment Amount' }}
+        @if (outstandingAmount() !== 0) {
+          <span class="form-label__hint">
+            ({{ isRefundMode() ? 'Refund due' : 'Outstanding' }}: {{ formatAmount(outstandingAmount()) }})
+          </span>
         }
       </label>
       <div class="amount-input-group">
@@ -19,7 +21,6 @@
           type="number"
           class="form-input form-input--amount"
           [(ngModel)]="amount"
-          [min]="0"
           [step]="0.01"
           [disabled]="processing()"
           placeholder="0.00"
@@ -63,9 +64,12 @@
       (click)="pay()"
       type="button"
       [disabled]="processing() || amount() <= 0"
+      [disabled]="processing() || amount() === 0"
     >
       @if (processing()) {
         Processing...
+      } @else if (isRefundMode()) {
+        Issue Refund {{ formatAmount(amount()) }}
       } @else {
         Pay {{ formatAmount(amount()) }}
       }

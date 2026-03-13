@@ -14,7 +14,12 @@ import { CartItem } from '@pos/tmf663';
       (click)="emitEdit()"
     >
       <div class="item-header">
-        <strong>{{ item.product?.name }}</strong>
+        <div class="item-title">
+          <strong>{{ item.product?.name }}</strong>
+          @if (isReturnPosition()) {
+            <span class="badge badge--return">Return</span>
+          }
+        </div>
         <div class="item-actions">
           <span class="quantity">Qty: {{ item.quantity }}</span>
           <button
@@ -81,5 +86,12 @@ export class CartItemComponent {
   emitRemove(event: MouseEvent): void {
     event.stopPropagation();
     this.onRemove.emit();
+  }
+
+  isReturnPosition(): boolean {
+    const description = (this.item.product?.description || '').toUpperCase();
+    const hasReturnMarker = description.includes('RETURN|ORDER:');
+    const gross = this.item.itemPrice?.[0]?.price?.taxIncludedAmount?.value ?? 0;
+    return hasReturnMarker || gross < 0;
   }
 }

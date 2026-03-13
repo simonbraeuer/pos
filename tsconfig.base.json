@@ -51,6 +51,9 @@
       "@pos/cart-process-edit-sale-bundle-offer": [
         "libs/cart-process-edit-sale-bundle-offer/src/index.ts"
       ],
+      "@pos/cart-process-return": [
+        "libs/cart-process-return/src/index.ts"
+      ],
       "@pos/checkout-action-payment-cash": [
         "libs/checkout-action-payment-cash/src/index.ts"
       ],

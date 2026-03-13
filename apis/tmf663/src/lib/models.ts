@@ -109,4 +109,12 @@ export interface AddCartPositionRequest {
   quantity: number;
   serialNumber?: string;
   customerReference?: string;
+  /**
+   * When present the position is treated as a return.
+   * The price will be negated (negative gross/net) in the resulting cart item.
+   * Provide the unit price of the original order position.
+   * `originalQuantity` is the quantity on the source order item and is used
+   * to enforce that the same position cannot be returned more times than ordered.
+   */
+  returnPrice?: { gross: number; net: number; currency: string; originalQuantity?: number };
 }

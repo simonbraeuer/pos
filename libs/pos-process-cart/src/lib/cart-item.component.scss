@@ -20,8 +20,31 @@
     align-items: center;
     margin-bottom: 0.35rem;
 
-    strong {
-      color: #333;
+    .item-title {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      min-width: 0;
+
+      strong {
+        color: #333;
+      }
+    }
+
+    .badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 0.12rem 0.36rem;
+      border-radius: 999px;
+      line-height: 1.2;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+
+      &--return {
+        background: #fdf0d5;
+        color: #9a3412;
+        border: 1px solid #f5c385;
+      }
     }
 
     .item-actions {

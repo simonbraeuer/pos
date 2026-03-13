@@ -13,7 +13,7 @@ export class ProductPositionHandler implements CartPositionSelectionHandler {
 
   isForCartPosition(position: CartItem): boolean {
     // Product edit flow applies only to positions without bundle components.
-    return !!position.product && !this.hasBundleComponents(position);
+    return !!position.product && !this.hasBundleComponents(position) && !this.isReturnPosition(position);
   }
 
   selectPosition(position: CartItem): void {
@@ -31,5 +31,12 @@ export class ProductPositionHandler implements CartPositionSelectionHandler {
 
   private hasBundleComponents(position: CartItem): boolean {
     return (position.bundleComponents?.length ?? 0) > 0;
+  }
+
+  private isReturnPosition(position: CartItem): boolean {
+    const description = (position.product?.description || "").toUpperCase();
+    const hasReturnMarker = description.includes("RETURN|ORDER:");
+    const gross = position.itemPrice?.[0]?.price?.taxIncludedAmount?.value ?? 0;
+    return hasReturnMarker || gross < 0;
   }
 }

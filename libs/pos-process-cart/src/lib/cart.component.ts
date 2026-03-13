@@ -347,7 +347,7 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   private updateSelectedPositionFromUrl(url: string): void {
-    const match = url.match(/\/edit-sale-(?:product|bundle)-offer\/([^/?#]+)/);
+    const match = url.match(/\/(?:edit-sale-(?:product|bundle)-offer|return)\/([^/?#]+)/);
     this.selectedPositionId.set(match?.[1] ?? null);
   }
 

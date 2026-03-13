@@ -28,6 +28,17 @@ function maybeNetworkError(): Observable<never> | null {
   return null;
 }
 
+/**
+ * Parses a RETURN|ORDER:...|ITEM:... reference from any text string.
+ * Works on both customerReference values and full cart-item description strings.
+ */
+function parseReturnRef(text: string | undefined): { orderId: string; itemId: string } | null {
+  if (!text) return null;
+  const match = text.match(/RETURN\|ORDER:([^|]+)\|ITEM:([^|]+)/i);
+  if (!match) return null;
+  return { orderId: match[1].trim(), itemId: match[2].trim() };
+}
+
 /** Initial cart seed data */
 const INITIAL_CARTS: ShoppingCart[] = Array.from(new Map<string, ShoppingCart>([
   [
@@ -793,8 +804,44 @@ export class Tmf663ApiService implements OnInit {
             return;
           }
 
+          // Validate that the same order position is not returned more times than it was ordered.
+          if (request.returnPrice?.originalQuantity !== undefined) {
+            const returnRef = parseReturnRef(request.customerReference);
+            if (returnRef) {
+              const alreadyReturned = cart.cartItem.reduce((sum, item) => {
+                const ref = parseReturnRef(item.product?.description);
+                if (ref && ref.orderId === returnRef.orderId && ref.itemId === returnRef.itemId) {
+                  return sum + item.quantity;
+                }
+                return sum;
+              }, 0);
+              const maxAllowed = request.returnPrice.originalQuantity;
+              if (alreadyReturned + request.quantity > maxAllowed) {
+                const err = new Error(
+                  `Cannot return more than ${maxAllowed} unit(s) for this position. Already returned: ${alreadyReturned}.`
+                ) as Error & { status?: number };
+                err.status = 409;
+                subscriber.error(err);
+                return;
+              }
+            }
+          }
+
         const taxRate = 20;
-        const netUnit = Number((offer.cheapestPrice / (1 + taxRate / 100)).toFixed(2));
+        let grossUnit: number;
+        let netUnit: number;
+        let currency: string;
+
+        if (request.returnPrice) {
+          grossUnit = -Math.abs(request.returnPrice.gross);
+          netUnit = -Math.abs(request.returnPrice.net);
+          currency = request.returnPrice.currency;
+        } else {
+          grossUnit = offer.cheapestPrice;
+          netUnit = Number((offer.cheapestPrice / (1 + taxRate / 100)).toFixed(2));
+          currency = offer.currency;
+        }
+
         const newItem: CartItem = {
           id: `item-${Date.now()}`,
           action: 'add',
@@ -814,11 +861,11 @@ export class Tmf663ApiService implements OnInit {
           },
           itemPrice: [
             {
-              name: 'One-time charge',
+              name: request.returnPrice ? 'Return' : 'One-time charge',
               priceType: 'oneTime',
               price: {
-                dutyFreeAmount: { unit: offer.currency, value: netUnit },
-                taxIncludedAmount: { unit: offer.currency, value: offer.cheapestPrice },
+                dutyFreeAmount: { unit: currency, value: netUnit },
+                taxIncludedAmount: { unit: currency, value: grossUnit },
                 taxRate,
               },
             },

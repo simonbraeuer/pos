@@ -12,6 +12,7 @@ import { provideProductOfferHandler } from "@pos/cart-process-edit-sale-product-
 import { provideBundleOfferHandler } from "@pos/cart-process-edit-sale-bundle-offer";
 import { provideProductPositionHandler } from "@pos/cart-process-edit-sale-product-offer";
 import { provideBundlePositionHandler } from "@pos/cart-process-edit-sale-bundle-offer";
+import { provideReturnPositionHandler } from "@pos/cart-process-return";
 import { provideCheckoutActionPaymentCash } from "@pos/checkout-action-payment-cash";
 import { provideCheckoutActionPaymentCardOffline } from "@pos/checkout-action-payment-card-offline";
 import { provideCheckoutReceiptOptions } from "@pos/checkout-receipt-options";
@@ -44,6 +45,7 @@ export const appConfig: ApplicationConfig = {
     // CartPositionSelectionHandler providers (IoC for editing existing cart positions)
     ...provideProductPositionHandler(),
     ...provideBundlePositionHandler(),
+    ...provideReturnPositionHandler(),
 
     // Checkout action providers
     ...provideCheckoutActionPaymentCash(),

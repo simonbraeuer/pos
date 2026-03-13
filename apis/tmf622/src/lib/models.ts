@@ -70,6 +70,8 @@ export interface ProductRefOrValue {
 export interface ProductOrderItem {
   id: string;
   quantity: number;
+  /** Tracks how many units of this item have been returned (persisted per return action). */
+  returnedQuantity?: number;
   action: 'add' | 'modify' | 'delete' | 'noChange';
   state?: ProductOrderItemState;
   productOffering?: {

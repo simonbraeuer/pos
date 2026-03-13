@@ -1,0 +1,164 @@
+.return-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  &__label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #3d3d3d;
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.5rem;
+
+    input {
+      width: 100%;
+      min-width: 0;
+      border: 1px solid #d3d8df;
+      border-radius: 8px;
+      padding: 0.55rem 0.7rem;
+      font-size: 0.92rem;
+    }
+  }
+
+  &__summary {
+    margin: 0;
+    color: #555;
+  }
+}
+
+.return-content {
+  height: 100%;
+}
+
+.wizard-step {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 100%;
+
+  h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    color: #1d1d1d;
+  }
+
+  h4 {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #3e3e3e;
+  }
+}
+
+.transaction-list,
+.position-list,
+.reason-list {
+  border: 1px solid #e3e5ea;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.transaction-row,
+.position-row {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid #edf0f4;
+  background: #fff;
+  text-align: left;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+  padding: 0.7rem 0.8rem;
+  cursor: pointer;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: #f5f9ff;
+  }
+}
+
+.transaction-row--active,
+.position-row--active {
+  background: #e8f2ff;
+}
+
+.transaction-row__id,
+.position-row__name {
+  font-weight: 600;
+  color: #222;
+}
+
+.transaction-row__meta,
+.position-row__meta {
+  color: #666;
+  font-size: 0.82rem;
+}
+
+.position-row__price {
+  align-self: center;
+  color: #106c3f;
+  font-weight: 600;
+  font-size: 0.88rem;
+}
+
+.reason-option {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem 0.8rem;
+  border-bottom: 1px solid #edf0f4;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  input {
+    margin: 0;
+  }
+}
+
+.btn {
+  border: none;
+  border-radius: 8px;
+  padding: 0.55rem 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.btn--primary {
+  background: #2759c6;
+  color: #fff;
+}
+
+.btn--secondary {
+  background: #e8eaf0;
+  color: #25303f;
+}
+
+.error {
+  margin: 0;
+  border: 1px solid #f7c7cd;
+  background: #fff3f5;
+  color: #9d1a2b;
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+}
+
+.empty,
+.muted {
+  margin: 0;
+  color: #666;
+}

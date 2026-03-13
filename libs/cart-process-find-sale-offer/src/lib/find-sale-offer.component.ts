@@ -1,12 +1,16 @@
 import { Component, OnInit, inject, signal } from "@angular/core";
 import { CommonModule, DecimalPipe } from "@angular/common";
 import { FormsModule } from "@angular/forms";
-import { ActivatedRoute } from "@angular/router";
-import { 
+import { ActivatedRoute, Router } from "@angular/router";
+import {
   SaleOfferSearchResultHandler,
-  SALE_OFFER_SEARCH_RESULT_HANDLERS 
+  SALE_OFFER_SEARCH_RESULT_HANDLERS
 } from "@pos/cart-core";
-import { ProcessContentLayoutComponent } from "@pos/core-ui";
+import {
+  ActionButtonComponent,
+  ActionButtonPanelComponent,
+  ProcessContentLayoutComponent,
+} from "@pos/core-ui";
 import {
   SaleOfferSearchResult,
   Tmf663ApiService,
@@ -15,7 +19,14 @@ import {
 @Component({
   selector: "pos-find-sale-offer",
   standalone: true,
-  imports: [CommonModule, ProcessContentLayoutComponent, FormsModule, DecimalPipe],
+  imports: [
+    CommonModule,
+    ProcessContentLayoutComponent,
+    ActionButtonComponent,
+    ActionButtonPanelComponent,
+    FormsModule,
+    DecimalPipe,
+  ],
   template: `
     <lib-process-content-layout
       icon="🔎"
@@ -71,6 +82,22 @@ import {
           }
         }
       </div>
+
+      <div slot="side" class="process-side-actions">
+        <h3 class="process-side-actions__title">Actions</h3>
+        <lib-action-button-panel [columns]="1">
+          <lib-action-button
+            icon="🛒"
+            text="New Cart"
+            (onClick)="openNewCart()"
+          />
+          <lib-action-button
+            icon="↩️"
+            text="Add Return"
+            (onClick)="openReturnWizard()"
+          />
+        </lib-action-button-panel>
+      </div>
     </lib-process-content-layout>
   `,
   styleUrl: "./find-sale-offer.component.scss",
@@ -78,6 +105,7 @@ import {
 export class FindSaleOfferComponent implements OnInit {
   private api = inject(Tmf663ApiService);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private handlers = inject(SALE_OFFER_SEARCH_RESULT_HANDLERS, { optional: true }) || [];
 
   searchTerm = "";
@@ -120,5 +148,13 @@ export class FindSaleOfferComponent implements OnInit {
       this.error.set(`No handler registered for ${offer.kind} offers.`);
       console.error(`No handler found for offer kind: ${offer.kind}`, offer);
     }
+  }
+
+  openNewCart(): void {
+    this.router.navigate(['/new-cart']);
+  }
+
+  openReturnWizard(): void {
+    this.router.navigate(['../return'], { relativeTo: this.route });
   }
 }

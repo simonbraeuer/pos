@@ -35,6 +35,9 @@ export class OrderProcessPaymentCashComponent {
   order = computed<ProductOrder | null>(() => {
     return this.route.parent?.snapshot.data['order'] || null;
   });
+  /** True when the outstanding balance is negative — store owes the customer a refund */
+  isRefundMode = computed<boolean>(() => this.outstandingAmount() < 0);
+
 
   /** Total order amount (transaction amount) */
   private totalAmount = computed<number>(() => {
@@ -87,7 +90,7 @@ export class OrderProcessPaymentCashComponent {
         
         const outstanding = this.totalAmount() - paidAmount;
         this.outstandingAmount.set(outstanding);
-        this.amount.set(Math.max(0, outstanding)); // Prefill with outstanding (non-negative)
+        this.amount.set(outstanding); // Prefill with outstanding (negative for refunds)
       },
       error: () => {
         // Fallback to total amount
@@ -105,8 +108,8 @@ export class OrderProcessPaymentCashComponent {
     if (!order || this.processing()) return;
 
     const paymentAmount = this.amount();
-    if (paymentAmount <= 0) {
-      this.error.set('Payment amount must be greater than zero');
+    if (paymentAmount === 0) {
+      this.error.set('Amount must not be zero');
       return;
     }
 
@@ -116,7 +119,7 @@ export class OrderProcessPaymentCashComponent {
     const paymentRequest: CreatePaymentRequest = {
       externalId: order.id,
       amount: { unit: 'EUR', value: paymentAmount },
-      description: this.notes() || 'Cash payment',
+      description: this.notes() || (paymentAmount < 0 ? 'Cash refund' : 'Cash payment'),
       paymentMethod: {
         id: 'pm-cash',
         name: 'Cash',

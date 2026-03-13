@@ -37,11 +37,15 @@ export class OrderProcessPaymentCardOfflineComponent {
 
   /** Payment method name shown in the page title */
   paymentMethodName = computed<string>(() => {
-    return this.cardType() === 'credit' ? 'Credit Card' : 'Debit Card';
+    const base = this.cardType() === 'credit' ? 'Credit Card' : 'Debit Card';
+    return this.isRefundMode() ? `${base} Refund` : base;
   });
 
   /** CVV (not persisted, only for validation) */
   cvv = signal<string>('');
+
+  /** True when the outstanding balance is negative — store owes the customer a refund */
+  isRefundMode = computed<boolean>(() => this.outstandingAmount() < 0);
 
   /** Processing state */
   processing = signal<boolean>(false);
@@ -108,7 +112,7 @@ export class OrderProcessPaymentCardOfflineComponent {
         
         const outstanding = this.totalAmount() - paidAmount;
         this.outstandingAmount.set(outstanding);
-        this.amount.set(Math.max(0, outstanding)); // Prefill with outstanding (non-negative)
+        this.amount.set(outstanding); // Prefill with outstanding (negative for refunds)
       },
       error: () => {
         // Fallback to total amount
@@ -138,7 +142,7 @@ export class OrderProcessPaymentCardOfflineComponent {
     const cvvPattern = /^\d{3,4}$/; // 3-4 digits
 
     return (
-      this.amount() > 0 &&
+      this.amount() !== 0 &&
       this.cardHolder().trim().length > 0 &&
       cardNum.length === 16 &&
       expiryPattern.test(this.expiryDate()) &&
@@ -178,7 +182,7 @@ export class OrderProcessPaymentCardOfflineComponent {
   }
 
   resetForm(): void {
-    this.amount.set(Math.max(0, this.outstandingAmount()));
+    this.amount.set(this.outstandingAmount());
     this.cardType.set('credit');
     this.cardHolder.set('');
     this.cardNumber.set('');
@@ -231,12 +235,14 @@ export class OrderProcessPaymentCardOfflineComponent {
 
     const paymentAmount = this.amount();
     const maskedCard = this.maskCardNumber(this.cardNumber());
-    const label = this.cardType() === 'credit' ? '💳 Credit Card' : '💳 Debit Card';
+    const baseLabel = this.cardType() === 'credit' ? '💳 Credit Card' : '💳 Debit Card';
+    const label = this.isRefundMode() ? `${baseLabel} Refund` : baseLabel;
+    const action = this.isRefundMode() ? 'refund' : 'payment';
 
     const paymentRequest: CreatePaymentRequest = {
       externalId: order.id,
       amount: { unit: 'EUR', value: paymentAmount },
-      description: `${label} payment - ${maskedCard}`,
+      description: `${label} ${action} - ${maskedCard}`,
       paymentMethod: {
         id: this.cardType() === 'credit' ? 'pm-card-credit' : 'pm-card-debit',
         name: `${label} - ${maskedCard}`,

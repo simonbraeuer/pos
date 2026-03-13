@@ -115,3 +115,16 @@
   padding: 2rem;
   text-align: center;
 }
+
+.process-side-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+
+  &__title {
+    margin: 0;
+    font-size: 1rem;
+    color: #2f2f2f;
+  }
+}

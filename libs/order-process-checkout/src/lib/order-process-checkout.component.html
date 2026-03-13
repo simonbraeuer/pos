@@ -44,9 +44,15 @@
           <!-- Totals Section -->
           <div class="totals-section">
             <div class="total-line">
-              <span class="total-line__label">Paid Amount:</span>
+              <span class="total-line__label">Amount Received:</span>
               <span class="total-line__value total-line__value--paid">
-                {{ formatAmount(paidAmount()) }}
+                {{ formatAmount(receivedAmount()) }}
+              </span>
+            </div>
+            <div class="total-line">
+              <span class="total-line__label">Amount Paid Out:</span>
+              <span class="total-line__value total-line__value--paid">
+                {{ formatAmount(paidOutAmount()) }}
               </span>
             </div>
             <div class="total-line">

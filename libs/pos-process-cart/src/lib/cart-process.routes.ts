@@ -75,6 +75,20 @@ export const CART_PROCESS_ROUTES: Routes = [
       ),
   },
   {
+    path: "return",
+    loadComponent: () =>
+      import("@pos/cart-process-return").then(
+        (m) => m.CartProcessReturnComponent
+      ),
+  },
+  {
+    path: "return/:id",
+    loadComponent: () =>
+      import("@pos/cart-process-return").then(
+        (m) => m.CartProcessReturnComponent
+      ),
+  },
+  {
     path: 'edit-cart-customer',
     loadComponent: () =>
       import('@pos/pos-process-edit-cart-customer').then(

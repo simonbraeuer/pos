@@ -95,14 +95,32 @@ export class OrderProcessCheckoutComponent {
     }, 0);
   });
 
-  /** Paid amount (sum of completed payments) */
-  paidAmount = computed<number>(() => {
-    return this.visiblePayments()
-      .filter(p => p.status === 'completed' || p.status === 'authorized')
-      .reduce((sum, payment) => {
-        const amount = payment.amount?.value || 0;
-        return sum + amount;
-      }, 0);
+  /** Settled payments (completed/authorized), including refunds/payouts. */
+  settledPayments = computed<Payment[]>(() => {
+    return this.payments().filter(
+      (payment) => payment.status === 'completed' || payment.status === 'authorized'
+    );
+  });
+
+  /** Amount received from customer (positive settled payments only). */
+  receivedAmount = computed<number>(() => {
+    return this.settledPayments().reduce((sum, payment) => {
+      const amount = payment.amount?.value || 0;
+      return amount > 0 ? sum + amount : sum;
+    }, 0);
+  });
+
+  /** Amount paid out to customer (absolute value of negative settled payments). */
+  paidOutAmount = computed<number>(() => {
+    return this.settledPayments().reduce((sum, payment) => {
+      const amount = payment.amount?.value || 0;
+      return amount < 0 ? sum + Math.abs(amount) : sum;
+    }, 0);
+  });
+
+  /** Net settled amount: received minus paid-out. */
+  netSettledAmount = computed<number>(() => {
+    return this.receivedAmount() - this.paidOutAmount();
   });
 
   /** Payments visible in checkout (refund entries and refunded originals are hidden) */
@@ -135,9 +153,9 @@ export class OrderProcessCheckoutComponent {
     });
   });
 
-  /** Outstanding amount (total - paid) */
+  /** Outstanding amount (order total - settled net). Handles both payments and payouts. */
   outstandingAmount = computed<number>(() => {
-    return this.totalAmount() - this.paidAmount();
+    return this.totalAmount() - this.netSettledAmount();
   });
 
   /** Check if there are any payments */
@@ -152,7 +170,9 @@ export class OrderProcessCheckoutComponent {
 
     // Fallback: if payment settlement reaches total and no pending overlays remain,
     // treat the order as complete even if order-state refresh is momentarily stale.
-    const fullyPaid = this.outstandingAmount() <= this.amountEpsilon;
+    // Use Math.abs: a negative outstanding (refund order awaiting refund payment) must NOT
+    // auto-complete — the refund payment still needs to be recorded.
+    const fullyPaid = Math.abs(this.outstandingAmount()) <= this.amountEpsilon;
     const noPending = !this.showPendingOverlay() && !this.showPendingRefundOverlay();
     return !!order && fullyPaid && noPending;
   });
@@ -297,7 +317,7 @@ export class OrderProcessCheckoutComponent {
   };
 
   private isRefundPayment(payment: Payment): boolean {
-    return !!payment.originalPaymentId;
+    return !!payment.originalPaymentId || payment.isRefund === true;
   }
 
   /**

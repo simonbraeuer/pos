@@ -20,7 +20,7 @@ export const appRoutes: Routes = [
         loadComponent: () =>
           import("@pos/tablet-selection").then(m => m.TabletSelectionComponent),
       },
-      { path: "", redirectTo: "cart/cart-001", pathMatch: "full" },
+      { path: "", redirectTo: "new-cart", pathMatch: "full" },
       {
         path: "show-user",
         loadComponent: () =>
