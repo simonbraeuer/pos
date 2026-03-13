@@ -1,96 +1,97 @@
-# Pos
+## Outlook & Future Improvements
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+Planned enhancements for this POS application include:
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+- **Full POS Feature Set:**
+	- Retail cancellation
+	- X-report and Z-report generation
+	- Discounts and promotions
+	- EFT day-end processing
+	- Additional retail workflows
+- **Backend Flexibility:**
+	- Option to configure a real backend endpoint (e.g., via localStorage)
+	- Seamless switch between mock (IndexedDB) and real backend for integration and production use
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/getting-started/intro#learn-nx?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+These improvements will further align the application with real-world retail requirements and enable integration with external systems.
 
-## Run tasks
+# POS Application (Nx Monorepo)
 
-To run tasks with Nx use:
+This repository contains a modular, production-ready Point of Sale (POS) application built with Angular and managed using the Nx monorepo toolchain.
 
-```sh
-npx nx <target> <project-name>
-```
+## Overview
 
-For example:
+- **Framework:** Angular 21 (standalone components, modern Angular features)
+- **Monorepo:** Nx, with multiple apps and libraries for clear separation of concerns
+- **Styling:** SCSS, shared styles
+- **Build Tool:** Vite (via @analogjs/vite-plugin-angular)
+- **Testing:** Vitest, Angular unit tests
+- **Linting:** ESLint
 
-```sh
-npx nx build myproject
-```
+## Main Application: `pos`
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+The `apps/pos` project is the main POS frontend. It features:
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+- Modern Angular architecture (standalone bootstrapping, feature modules)
+- Modular business logic (cart, checkout, user management, product catalog, etc.)
+- Dynamic menu and process registration via dependency injection
+- Route guards for authentication and admin features
+- Extensible via Nx libraries (see `libs/`)
 
-## Add new projects
+### Key Features
 
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
+- **Authentication:** Login, session restore, and user profile
+- **Cart Management:** Create, edit, and search carts; add/remove products and bundles
+- **Order Processing:** View, create, and manage orders
+- **Admin Tools:** Manage users, products, payment methods, and demo configuration
+- **Tablet Selection:** Device-specific workflows
+- **Customizable Menu:** Dynamic registration of processes and admin-only features
 
-To install a new plugin you can use the `nx add` command. Here's an example of adding the React plugin:
-```sh
-npx nx add @nx/react
-```
+## Development
 
-Use the plugin's generator to create new projects. For example, to create a new React app or library:
-
-```sh
-# Generate an app
-npx nx g @nx/react:app demo
-
-# Generate a library
-npx nx g @nx/react:lib some-lib
-```
-
-You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
-
-[Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Set up CI!
-
-### Step 1
-
-To connect to Nx Cloud, run the following command:
+Install dependencies:
 
 ```sh
-npx nx connect
+npm install
 ```
 
-Connecting to Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
-
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-### Step 2
-
-Use the following command to configure a CI workflow for your workspace:
+Start the development server:
 
 ```sh
-npx nx g ci-workflow
+npm run dev
 ```
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+Build for production:
 
-## Install Nx Console
+```sh
+npm run build
+```
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
 
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## Backend Emulation with IndexedDB
 
-## Useful links
 
-Learn more:
+This POS application does not require a traditional backend server for core functionality. Instead, all backend logic and data persistence are fully emulated on the frontend using the browser's IndexedDB API. This is achieved via the reusable `idb-storage` library (`libs/idb-storage`), which provides a generic service for CRUD operations and persistent storage.
 
-- [Learn more about this workspace setup](https://nx.dev/getting-started/intro#learn-nx?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## API Design Reference: TMF
 
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+The implementation of the API services in this project is based on the TMF (TM Forum Open APIs) standards. These specifications provide a consistent, industry-standard approach for designing APIs in the telecommunications and digital services domain.
+
+- For more information, see the [TM Forum Open APIs documentation](https://www.tmforum.org/open-apis/).
+
+The API modules in `apis/` (such as `tmf663`, `tmf691`, etc.) follow the structure and semantics defined in the TMF documentation, ensuring compatibility and best practices.
+
+- **All business data** (carts, orders, users, products, etc.) is stored locally in the browser.
+- **API services** in the `apis/` folder use the `IdbService` to simulate backend endpoints and data flows.
+- **No network connection** is required for normal operation; the app works entirely offline.
+- This approach enables rapid prototyping, demo deployments, and robust offline-first workflows.
+
+## Deployment
+
+The latest version is deployed at:
+
+- [https://simonbraeuer.github.io/pos/](https://simonbraeuer.github.io/pos/)
+
+Deployment uses GitHub Pages via the `deploy` script, which builds the app and publishes the output from `dist/apps/pos/browser`.
+
+---
+For more details, see the source code in `apps/pos` and the various libraries in `libs/`.
