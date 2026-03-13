@@ -14,6 +14,13 @@ import {
 
 
 // --- API Behaviour Config ---
+
+/**
+ * UTF-8 safe base64 encode (btoa for Unicode)
+ */
+function btoaUtf8(str: string): string {
+  return btoa(unescape(encodeURIComponent(str)));
+}
 interface ApiBehaviourConfig {
   latency: number;
   errorRate: number;
@@ -157,7 +164,7 @@ function buildPdfBase64(lines: string[]): string {
   }
   pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
 
-  return btoa(pdf);
+  return btoaUtf8(pdf);
 }
 
 function buildReceiptTextLines(
@@ -254,7 +261,7 @@ function buildRenderedDocument(
   }
 
   const commandText = buildEpsonCommandText(lines);
-  const contentBase64 = btoa(commandText);
+  const contentBase64 = btoaUtf8(commandText);
   return {
     id: withCopyWatermark ? `doc-${bill.id}-epson-tmt88-copy` : `doc-${bill.id}-epson-tmt88`,
     name: `Receipt ${bill.billNo || bill.id} (EPSON TM-T88${withCopyWatermark ? ' - COPY' : ''})`,
