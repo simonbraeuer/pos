@@ -390,24 +390,6 @@ button {
     cursor: not-allowed;
   }
 
-  &.btn-primary {
-    background: #3498db;
-    color: white;
-
-    &:hover:not(:disabled) {
-      background: #2980b9;
-    }
-  }
-
-  &.btn-secondary {
-    background: #95a5a6;
-    color: white;
-
-    &:hover:not(:disabled) {
-      background: #7f8c8d;
-    }
-  }
-
   &.btn-danger {
     background: #e74c3c;
     color: white;

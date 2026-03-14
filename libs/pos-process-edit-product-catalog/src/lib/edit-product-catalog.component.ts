@@ -38,7 +38,7 @@ interface CharacteristicFormItem {
 
       @if (viewMode() === 'list') {
         <div class="toolbar">
-          <button class="btn-primary" (click)="startCreate()">
+          <button class="btn btn--primary" (click)="startCreate()">
             ➕ Create New Product
           </button>
         </div>
@@ -74,7 +74,7 @@ interface CharacteristicFormItem {
               <option [ngValue]="false">Products</option>
               <option [ngValue]="true">Bundles</option>
             </select>
-            <button class="btn-secondary" (click)="clearFilters()">Clear</button>
+            <button class="btn btn--secondary" (click)="clearFilters()">Clear</button>
           </div>
         </div>
 
@@ -141,7 +141,7 @@ interface CharacteristicFormItem {
 
           <div class="pagination">
             <button
-              class="btn-secondary"
+              class="btn btn--secondary"
               [disabled]="currentPage() === 0"
               (click)="previousPage()"
             >
@@ -151,7 +151,7 @@ interface CharacteristicFormItem {
               Page {{ currentPage() + 1 }} of {{ totalPages() }} ({{ totalItems() }} total)
             </span>
             <button
-              class="btn-secondary"
+              class="btn btn--secondary"
               [disabled]="!hasMore()"
               (click)="nextPage()"
             >
@@ -165,7 +165,7 @@ interface CharacteristicFormItem {
         <div class="form-container">
           <div class="form-header">
             <h3>{{ viewMode() === 'create' ? 'Create New Product' : 'Edit Product' }}</h3>
-            <button class="btn-secondary" (click)="cancelEdit()">✕ Cancel</button>
+            <button class="btn btn--secondary" (click)="cancelEdit()">✕ Cancel</button>
           </div>
 
           @if (formError()) {
@@ -256,7 +256,7 @@ interface CharacteristicFormItem {
             <div class="prices-section">
               <div class="prices-header">
                 <h4>Prices</h4>
-                <button type="button" class="btn-secondary" (click)="addPrice()">
+                <button type="button" class="btn btn--secondary" (click)="addPrice()">
                   ➕ Add Price
                 </button>
               </div>
@@ -330,7 +330,7 @@ interface CharacteristicFormItem {
             <div class="characteristics-section">
               <div class="characteristics-header">
                 <h4>Custom Characteristics</h4>
-                <button type="button" class="btn-secondary" (click)="addCharacteristic()">
+                <button type="button" class="btn btn--secondary" (click)="addCharacteristic()">
                   ➕ Add Characteristic
                 </button>
               </div>
@@ -389,12 +389,12 @@ interface CharacteristicFormItem {
             </div>
 
             <div class="form-actions">
-              <button type="button" class="btn-secondary" (click)="cancelEdit()">
+              <button type="button" class="btn btn--secondary" (click)="cancelEdit()">
                 Cancel
               </button>
               <button
                 type="submit"
-                class="btn-primary"
+                class="btn btn--primary"
                 [disabled]="saving() || !isFormValid()"
               >
                 {{ saving() ? 'Saving...' : viewMode() === 'create' ? 'Create' : 'Update' }}
@@ -414,7 +414,7 @@ interface CharacteristicFormItem {
             </p>
             <p class="warning">This action cannot be undone.</p>
             <div class="modal-actions">
-              <button class="btn-secondary" (click)="cancelDelete()">Cancel</button>
+              <button class="btn btn--secondary" (click)="cancelDelete()">Cancel</button>
               <button class="btn-danger" (click)="executeDelete()" [disabled]="deleting()">
                 {{ deleting() ? 'Deleting...' : 'Delete' }}
               </button>

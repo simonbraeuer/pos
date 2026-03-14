@@ -144,17 +144,10 @@ import { CartItem, Tmf663ApiService } from "@pos/tmf663";
       <div slot="nav-buttons">
         @if (step() === 1) {
           <button type="button" class="btn btn--secondary" (click)="abortReturnWizard()">Back</button>
-          <button type="button" class="btn btn--primary" [disabled]="!selectedPosition()" (click)="goToReasonStep()">
-            Next
-          </button>
+          <button type="button" class="btn btn--primary" [disabled]!selectedPosition() (click)="goToReasonStep()">Next</button>
         } @else {
           <button type="button" class="btn btn--secondary" (click)="goToSelectItemStep()">Back</button>
-          <button
-            type="button"
-            class="btn btn--primary"
-            [disabled]="!canAddToCart()"
-            (click)="addReturnToCart()"
-          >
+          <button type="button" class="btn btn--primary" [disabled]!canAddToCart() (click)="addReturnToCart()">
             @if (submitting()) { Adding... } @else { Add to cart }
           </button>
         }

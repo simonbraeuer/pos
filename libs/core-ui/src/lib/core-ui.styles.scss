@@ -1,0 +1,55 @@
+/* Common styles for elements projected via ng-content into core-ui components */
+
+.btn--primary {
+  min-width: 7rem;
+  padding: 0.62rem 1.05rem;
+  border: 1px solid #0d5941;
+  border-radius: 9px;
+  background: linear-gradient(120deg, #167a56 0%, #0f6446 100%);
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  box-shadow: 0 5px 14px rgba(19, 99, 70, 0.3);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.btn--primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn--secondary {
+  min-width: 7rem;
+  padding: 0.62rem 1.05rem;
+  border: 1px solid #b4c8bc;
+  border-radius: 9px;
+  background: #f9fffb;
+  color: #244b38;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  box-shadow: 0 2px 6px rgba(36, 75, 56, 0.08);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.btn--secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn--done {
+  min-width: 7rem;
+  padding: 0.62rem 1.05rem;
+  border: 1px solid #0d5941;
+  border-radius: 9px;
+  background: linear-gradient(120deg, #167a56 0%, #0f6446 100%);
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  box-shadow: 0 5px 14px rgba(19, 99, 70, 0.3);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.btn--done:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

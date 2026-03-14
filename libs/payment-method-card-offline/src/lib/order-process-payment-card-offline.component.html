@@ -144,18 +144,14 @@
     >
       Cancel
     </button>
-    <button
-      class="btn btn--primary"
-      (click)="pay()"
-      type="button"
-      [disabled]="processing() || !isFormValid()"
-    >
-      @if (processing()) {
-        Processing...
-      } @else {
+      <button
+        class="btn btn--primary"
+        (click)="pay()"
+        type="button"
+        [disabled]="processing() || !isFormValid()"
+      >
         Pay {{ formatAmount(amount()) }}
-      }
-    </button>
+      </button>
   </div>
 </lib-process-content-layout>
 
