@@ -7,9 +7,6 @@
     class="topbar__brand"
     role="button"
     tabindex="0"
-    (click)="toggleShopMenu()"
-    (keydown.enter)="toggleShopMenu()"
-    (keydown.space)="toggleShopMenu(); $event.preventDefault()"
   >
     <img class="topbar__logo" src="favicon.svg" alt="" aria-hidden="true" />
     <span class="topbar__title">POS</span>
@@ -39,9 +36,9 @@
     class="topbar__user"
     role="button"
     tabindex="0"
-    (click)="toggleMenu()"
-    (keydown.enter)="toggleMenu()"
-    (keydown.space)="toggleMenu(); $event.preventDefault()"
+    (click)="menuOpen.set(!menuOpen())"
+    (keydown.enter)="menuOpen.set(!menuOpen())"
+    (keydown.space)="menuOpen.set(!menuOpen()); $event.preventDefault()"
   >
     <span class="user-avatar">{{ initials() }}</span>
     <span class="user-info">
@@ -53,7 +50,7 @@
     @if (menuOpen()) {
       <div class="user-menu" (mousedown)="$event.stopPropagation()">
         @for (item of visibleItems(); track item.id) {
-          <a class="user-menu__item" [routerLink]="item.route" (click)="toggleMenu()">
+          <a class="user-menu__item" [routerLink]="item.route" (click)="menuOpen.set(false)">
             {{ item.icon }} {{ item.label }}
           </a>
         }

@@ -1,0 +1,25 @@
+.totals {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1rem;
+}
+.payments-list {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  padding: 0.5rem;
+  background: #fafafa;
+}
+.payment-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.25rem 0;
+  border-bottom: 1px solid #eee;
+  font-size: 0.95rem;
+}
+.payment-row:last-child {
+  border-bottom: none;
+}
+.in { color: green; }
+.out { color: #d32f2f; }

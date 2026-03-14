@@ -1,0 +1,16 @@
+{
+  "name": "pos-process-x-report",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/pos-process-x-report/src",
+  "projectType": "library",
+  "tags": ["scope:pos", "process"],
+  "targets": {
+    "test": {
+      "executor": "@nx/vite:test",
+      "outputs": ["{projectRoot}/coverage"]
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}

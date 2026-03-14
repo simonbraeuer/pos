@@ -27,6 +27,7 @@ import {
 } from "@pos/payment-method-card-offline";
 import { providePendingPaymentDefaultOverlay } from "@pos/pending-payment-default";
 import { providePendingRefundDefaultOverlay } from "@pos/pending-refund-default";
+import { provideXReportMenu } from "@pos/pos-process-x-report";
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -37,6 +38,7 @@ export const appConfig: ApplicationConfig = {
     ...provideSearchCartMenu(),
     ...provideNewCartMenu(),
     ...provideOrdersMenu(),
+    ...provideXReportMenu(),
 
     // SaleOfferSearchResultHandler providers (IoC for creating new cart positions)
     ...provideProductOfferHandler(),

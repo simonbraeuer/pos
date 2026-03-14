@@ -100,6 +100,9 @@
       ],
       "@pos/pos-process-configure-demo": [
         "libs/pos-process-configure-demo/src/index.ts"
+      ],
+      "@pos/pos-process-x-report": [
+        "libs/pos-process-x-report/src/index.ts"
       ]
       // @pos/api-behaviour-config mapping removed
 

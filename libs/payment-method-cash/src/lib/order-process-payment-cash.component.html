@@ -51,21 +51,10 @@
   </div>
 
   <div slot="nav-buttons" class="form-actions">
-    <button
-      class="btn btn--secondary"
-      (click)="goBack()"
-      type="button"
-      [disabled]="processing()"
-    >
+    <button type="button" class="btn btn--secondary" (click)="goBack()" [disabled]="processing()">
       Cancel
     </button>
-    <button
-      class="btn btn--primary"
-      (click)="pay()"
-      type="button"
-      [disabled]="processing() || amount() <= 0"
-      [disabled]="processing() || amount() === 0"
-    >
+    <button type="button" class="btn btn--primary" (click)="pay()" [disabled]="processing() || amount() <= 0">
       @if (processing()) {
         Processing...
       } @else if (isRefundMode()) {
