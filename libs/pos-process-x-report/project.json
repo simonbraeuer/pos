@@ -1,0 +1,6 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/pos-process-x-report/src",
+  "projectType": "library",
+  "tags": ["scope:pos", "process"]
+}

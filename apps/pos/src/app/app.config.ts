@@ -86,6 +86,7 @@ export const appConfig: ApplicationConfig = {
         registry.register({ id: "edit-product-catalog", label: "Manage Products", icon: "📦", route: "/edit-product-catalog", adminOnly: true });
         registry.register({ id: "edit-payment-methods", label: "Manage Payment Methods", icon: "💳", route: "/edit-payment-methods", adminOnly: true });
         registry.register({ id: "configure-demo", label: "Configure Demo", icon: "🛠️", route: "/configure-demo", adminOnly: true });
+        registry.register({ id: "x-report", label: "X-Report", icon: "📊", route: "/x-report" });
       },
       deps: [MenuRegistryService],
       multi: true,

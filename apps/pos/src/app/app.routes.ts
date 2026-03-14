@@ -85,6 +85,11 @@ export const appRoutes: Routes = [
           import("@pos/pos-process-configure-demo").then(m => m.PosProcessConfigureDemoComponent),
         canActivate: [adminGuard],
       },
+      {
+        path: "x-report",
+        loadComponent: () =>
+          import("@pos/pos-process-x-report").then(m => m.XReportComponent),
+      },
     ],
   },
   { path: "**", redirectTo: "" },
