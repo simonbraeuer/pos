@@ -18,54 +18,8 @@ interface PaymentListItem {
   selector: 'pos-x-report',
   standalone: true,
   imports: [CommonModule, ProcessContentLayoutComponent, CurrencyPipe],
-  template: `
-    <lib-process-content-layout [title]="'X-Report (Current Shift)'">
-      <div slot="content">
-        <div class="totals">
-          <div><strong>Money In:</strong> {{ moneyIn | currency }}</div>
-          <div><strong>Money Out:</strong> {{ moneyOut | currency }}</div>
-        </div>
-        <h3>Payments (Current Shift)</h3>
-        <div class="payments-list">
-          <div *ngFor="let payment of payments()" class="payment-row">
-            <span>{{ payment.timestamp | date:'short' }}</span>
-            <span>{{ payment.method }}</span>
-            <span [ngClass]="payment.direction">{{ payment.amount | currency }}</span>
-          </div>
-        </div>
-      </div>
-      <div slot="nav-buttons">
-        <button (click)="done()">Done</button>
-      </div>
-    </lib-process-content-layout>
-  `,
-  styles: [`
-    .totals {
-      display: flex;
-      gap: 2rem;
-      margin-bottom: 1rem;
-    }
-    .payments-list {
-      max-height: 300px;
-      overflow-y: auto;
-      border: 1px solid #eee;
-      border-radius: 4px;
-      padding: 0.5rem;
-      background: #fafafa;
-    }
-    .payment-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 0.25rem 0;
-      border-bottom: 1px solid #eee;
-      font-size: 0.95rem;
-    }
-    .payment-row:last-child {
-      border-bottom: none;
-    }
-    .in { color: green; }
-    .out { color: #d32f2f; }
-  `],
+  templateUrl: './x-report.component.html',
+  styleUrls: ['./x-report.component.scss'],
 })
 export class XReportComponent implements OnInit {
   private readonly router = inject(Router);

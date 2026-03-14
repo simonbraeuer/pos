@@ -2,6 +2,7 @@ import { APP_INITIALIZER, Provider } from '@angular/core';
 import { Router } from '@angular/router';
 import { BurgerMenuService } from '@pos/pos-shell';
 
+
 /**
  * Provider that registers the X-Report menu item in the burger menu
  */

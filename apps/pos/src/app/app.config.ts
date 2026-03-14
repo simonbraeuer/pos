@@ -27,6 +27,7 @@ import {
 } from "@pos/payment-method-card-offline";
 import { providePendingPaymentDefaultOverlay } from "@pos/pending-payment-default";
 import { providePendingRefundDefaultOverlay } from "@pos/pending-refund-default";
+import { provideXReportMenu } from "@pos/pos-process-x-report";
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -37,6 +38,7 @@ export const appConfig: ApplicationConfig = {
     ...provideSearchCartMenu(),
     ...provideNewCartMenu(),
     ...provideOrdersMenu(),
+    ...provideXReportMenu(),
 
     // SaleOfferSearchResultHandler providers (IoC for creating new cart positions)
     ...provideProductOfferHandler(),
@@ -86,7 +88,6 @@ export const appConfig: ApplicationConfig = {
         registry.register({ id: "edit-product-catalog", label: "Manage Products", icon: "📦", route: "/edit-product-catalog", adminOnly: true });
         registry.register({ id: "edit-payment-methods", label: "Manage Payment Methods", icon: "💳", route: "/edit-payment-methods", adminOnly: true });
         registry.register({ id: "configure-demo", label: "Configure Demo", icon: "🛠️", route: "/configure-demo", adminOnly: true });
-        registry.register({ id: "x-report", label: "X-Report", icon: "📊", route: "/x-report" });
       },
       deps: [MenuRegistryService],
       multi: true,
