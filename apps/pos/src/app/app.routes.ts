@@ -6,6 +6,7 @@ import { LoginComponent } from "@pos/login";
 import { authGuard, adminGuard, loginGuard } from "@pos/login";
 import { cartResolver, CART_PROCESS_ROUTES } from "@pos/pos-process-cart";
 import { orderResolver, ORDER_PROCESS_ROUTES } from "@pos/pos-process-order";
+import { EDIT_PRODUCT_CATALOG_ROUTES } from "@pos/pos-process-edit-product-catalog";
 import { tabletSelectionChildGuard } from "@pos/tablet-selection";
 
 export const appRoutes: Routes = [
@@ -40,9 +41,8 @@ export const appRoutes: Routes = [
       },
       {
         path: "edit-product-catalog",
-        loadComponent: () =>
-          import("@pos/pos-process-edit-product-catalog").then(m => m.EditProductCatalogComponent),
         canActivate: [adminGuard],
+        children: EDIT_PRODUCT_CATALOG_ROUTES,
       },
         {
           path: "edit-payment-methods",

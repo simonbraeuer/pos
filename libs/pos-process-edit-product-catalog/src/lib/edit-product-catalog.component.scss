@@ -20,13 +20,6 @@
 }
 
 .toolbar {
-  margin-bottom: 1.5rem;
-  display: flex;
-  justify-content: flex-start;
-}
-
-.filters {
-  margin-bottom: 1.5rem;
   padding: 1rem;
   background: #f8f9fa;
   border-radius: 8px;
@@ -390,7 +383,7 @@ button {
     cursor: not-allowed;
   }
 
-  &.btn-danger {
+  &.btn--danger {
     background: #e74c3c;
     color: white;
 
