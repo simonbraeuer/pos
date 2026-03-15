@@ -1,3 +1,19 @@
+/* Danger button style (global) */
+.btn--danger {
+  background: #e74c3c;
+  color: white;
+  border: 1px solid #e74c3c;
+  border-radius: 9px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  box-shadow: 0 2px 6px rgba(231, 76, 60, 0.15);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.btn--danger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 /* Common styles for elements projected via ng-content into core-ui components */
 
 .btn--primary {
