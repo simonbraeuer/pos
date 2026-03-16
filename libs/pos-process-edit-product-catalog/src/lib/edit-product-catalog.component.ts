@@ -27,7 +27,7 @@ type ViewMode = 'list'; // Only 'list' mode is now supported
         </div>
         <div slot="content">
           <div class="table-container">
-            <table>
+            <table class="sticky-header-table">
               <thead>
                 <tr>
                   <th>ID</th>
@@ -65,34 +65,38 @@ type ViewMode = 'list'; // Only 'list' mode is now supported
                   <th></th>
                 </tr>
               </thead>
-              <tbody #scrollableTbody (scroll)="onTableScroll($event)">
-                <tr *ngIf="products().length === 0">
-                  <td colspan="7" class="empty">No products found</td>
-                </tr>
-                <tr *ngFor="let product of products(); trackBy: trackById">
-                  <td>{{ product.id }}</td>
-                  <td>{{ product.name }}</td>
-                  <td>{{ getProductNumber(product) }}</td>
-                  <td>
-                    <span class="badge" [class.bundle]="product.isBundle">
-                      {{ product.isBundle ? 'Bundle' : 'Product' }}
-                    </span>
-                  </td>
-                  <td>
-                    <span class="status" [class]="product.lifecycleStatus || 'active'">
-                      {{ product.lifecycleStatus || 'active' }}
-                    </span>
-                  </td>
-                  <td>{{ getCheapestPrice(product) | number : '1.2-2' }}</td>
-                  <td class="actions">
-                    <button class="btn-icon" (click)="startEdit(product)" title="Edit">✏️</button>
-                    <button class="btn-icon btn--danger" (click)="confirmDelete(product)" title="Delete">🗑️</button>
-                  </td>
-                </tr>
-              </tbody>
             </table>
-            <div class="spinner-overlay" *ngIf="loading()">
-              <div class="spinner"></div>
+            <div class="scrollable-table-body" (scroll)="onTableScroll($event)">
+              <table class="sticky-header-table">
+                <tbody>
+                  <tr *ngIf="products().length === 0">
+                    <td colspan="7" class="empty">No products found</td>
+                  </tr>
+                  <tr *ngFor="let product of products(); trackBy: trackById">
+                    <td>{{ product.id }}</td>
+                    <td>{{ product.name }}</td>
+                    <td>{{ getProductNumber(product) }}</td>
+                    <td>
+                      <span class="badge" [class.bundle]="product.isBundle">
+                        {{ product.isBundle ? 'Bundle' : 'Product' }}
+                      </span>
+                    </td>
+                    <td>
+                      <span class="status" [class]="product.lifecycleStatus || 'active'">
+                        {{ product.lifecycleStatus || 'active' }}
+                      </span>
+                    </td>
+                    <td>{{ getCheapestPrice(product) | number : '1.2-2' }}</td>
+                    <td class="actions">
+                      <button class="btn-icon" (click)="startEdit(product)" title="Edit">✏️</button>
+                      <button class="btn-icon btn--danger" (click)="confirmDelete(product)" title="Delete">🗑️</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="spinner-overlay" *ngIf="loading()">
+                <div class="spinner"></div>
+              </div>
             </div>
           </div>
           <div *ngIf="deleteConfirm()">

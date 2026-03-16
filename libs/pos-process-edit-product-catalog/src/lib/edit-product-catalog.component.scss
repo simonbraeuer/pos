@@ -83,40 +83,38 @@
   margin-bottom: 1rem;
   position: relative;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.sticky-header-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+.sticky-header-table thead tr {
+  background: #f5f7fa;
+}
+
+.scrollable-table-body {
+  flex: 1 1 0;
+  min-height: 0;
+  height: 100%;
+  overflow-y: auto;
 }
 
 [slot="content"] {
   height: 100%;
   display: flex;
   flex-direction: column;
+  overflow-y: visible;
 }
 
 table {
   width: 100%;
-  height: 100%;
   border-collapse: collapse;
-  background: white;
-
-  thead {
-    background: #f5f7fa;
-    border-bottom: 2px solid #e0e0e0;
-    position: sticky;
-    top: 0;
-    z-index: 2;
-  }
-
-  tbody {
-    display: block;
-    height: 100%;
-    overflow-y: auto;
-    width: 100%;
-  }
-
-  thead, tbody tr {
-    display: table;
-    width: 100%;
-    table-layout: fixed;
-  }
+  /* Removed duplicate nested table styles. See root-level table block below. */
 }
 
 .filter-row th {
