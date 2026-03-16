@@ -21,27 +21,9 @@ type ViewMode = 'list'; // Only 'list' mode is now supported
       <lib-process-content-layout icon="📦" title="Product Catalog" [showAbort]="true" (abort)="handleAbort()">
         <div slot="side">
           <lib-action-button-panel>
-            <lib-action-button icon="➕" text="Create a new product" (click)="startEdit()">
-            </lib-action-button>
+            <lib-action-button icon="➕" text="Create a new product" (click)="startEdit()"></lib-action-button>
+            <lib-action-button icon="🧹" text="Clear filters" (click)="clearFilters()"></lib-action-button>
           </lib-action-button-panel>
-        </div>
-        <div slot="filter">
-          <div class="filters">
-            <input type="text" placeholder="Search by name..." [(ngModel)]="searchCriteria.name" (ngModelChange)="applyFilters()" />
-            <input type="text" placeholder="Product number..." [(ngModel)]="searchCriteria.productNumber" (ngModelChange)="applyFilters()" />
-            <select [(ngModel)]="searchCriteria.lifecycleStatus" (ngModelChange)="applyFilters()">
-              <option [ngValue]="undefined">All Statuses</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-              <option value="retired">Retired</option>
-            </select>
-            <select [(ngModel)]="searchCriteria.isBundle" (ngModelChange)="applyFilters()">
-              <option [ngValue]="undefined">All Types</option>
-              <option [ngValue]="false">Products</option>
-              <option [ngValue]="true">Bundles</option>
-            </select>
-            <button class="btn btn--secondary" (click)="clearFilters()">Clear</button>
-          </div>
         </div>
         <div slot="content">
           <div class="table-container">
@@ -56,8 +38,34 @@ type ViewMode = 'list'; // Only 'list' mode is now supported
                   <th>Price (€)</th>
                   <th>Actions</th>
                 </tr>
+                <tr class="filter-row">
+                  <th></th>
+                  <th>
+                    <input type="text" placeholder="Search by name..." [(ngModel)]="searchCriteria.name" (ngModelChange)="applyFilters()" />
+                  </th>
+                  <th>
+                    <input type="text" placeholder="Product number..." [(ngModel)]="searchCriteria.productNumber" (ngModelChange)="applyFilters()" />
+                  </th>
+                  <th>
+                    <select [(ngModel)]="searchCriteria.isBundle" (ngModelChange)="applyFilters()">
+                      <option [ngValue]="undefined">All Types</option>
+                      <option [ngValue]="false">Products</option>
+                      <option [ngValue]="true">Bundles</option>
+                    </select>
+                  </th>
+                  <th>
+                    <select [(ngModel)]="searchCriteria.lifecycleStatus" (ngModelChange)="applyFilters()">
+                      <option [ngValue]="undefined">All Statuses</option>
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                      <option value="retired">Retired</option>
+                    </select>
+                  </th>
+                  <th></th>
+                  <th></th>
+                </tr>
               </thead>
-              <tbody>
+              <tbody #scrollableTbody (scroll)="onTableScroll($event)">
                 <tr *ngIf="products().length === 0">
                   <td colspan="7" class="empty">No products found</td>
                 </tr>
@@ -83,11 +91,9 @@ type ViewMode = 'list'; // Only 'list' mode is now supported
                 </tr>
               </tbody>
             </table>
-          </div>
-          <div class="pagination">
-            <button class="btn btn--secondary" [disabled]="currentPage() === 0" (click)="previousPage()">← Previous</button>
-            <span class="page-info">Page {{ currentPage() + 1 }} of {{ totalPages() }} ({{ totalItems() }} total)</span>
-            <button class="btn btn--secondary" [disabled]="!hasMore()" (click)="nextPage()">Next →</button>
+            <div class="spinner-overlay" *ngIf="loading()">
+              <div class="spinner"></div>
+            </div>
           </div>
           <div *ngIf="deleteConfirm()">
             <div class="modal-overlay" (click)="cancelDelete()">
@@ -134,7 +140,7 @@ export class EditProductCatalogComponent implements OnInit {
   formError = signal<string | null>(null);
 
   currentPage = signal(0);
-  pageSize = 10;
+  pageSize = 30;
   totalItems = signal(0);
   hasMore = signal(false);
 
@@ -145,22 +151,22 @@ export class EditProductCatalogComponent implements OnInit {
   };
 
   ngOnInit(): void {
-    this.loadProducts();
+    this.resetAndLoadProducts();
   }
 
-  totalPages(): number {
-    return Math.ceil(this.totalItems() / this.pageSize);
-  }
-
-
-  loadProducts(): void {
+  // Infinite scroll: load more products and append
+  loadProducts(append = false): void {
     this.loading.set(true);
     this.error.set(null);
     this.api
       .searchProductOfferingsPaginated(this.searchCriteria, this.currentPage(), this.pageSize)
       .subscribe({
         next: result => {
-          this.products.set(result.items);
+          if (append) {
+            this.products.set([...this.products(), ...result.items]);
+          } else {
+            this.products.set(result.items);
+          }
           this.totalItems.set(result.total);
           this.hasMore.set(result.hasMore);
           this.loading.set(false);
@@ -172,30 +178,29 @@ export class EditProductCatalogComponent implements OnInit {
       });
   }
 
-
-  applyFilters(): void {
+  resetAndLoadProducts(): void {
     this.currentPage.set(0);
-    this.loadProducts();
+    this.products.set([]);
+    this.loadProducts(false);
   }
 
+
+
+  applyFilters(): void {
+    this.resetAndLoadProducts();
+  }
 
   clearFilters(): void {
     this.searchCriteria = { lifecycleStatus: 'active' };
-    this.currentPage.set(0);
-    this.loadProducts();
+    this.resetAndLoadProducts();
   }
 
-  nextPage(): void {
-    if (this.hasMore()) {
+  // Infinite scroll handler
+  onTableScroll(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (!this.loading() && this.hasMore() && target.scrollTop + target.clientHeight >= target.scrollHeight - 10) {
       this.currentPage.update(p => p + 1);
-      this.loadProducts();
-    }
-  }
-
-  previousPage(): void {
-    if (this.currentPage() > 0) {
-      this.currentPage.update(p => p - 1);
-      this.loadProducts();
+      this.loadProducts(true);
     }
   }
 
