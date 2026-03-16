@@ -1,7 +1,7 @@
 import { Component, HostListener, OnInit, inject, signal } from "@angular/core";
 import { FormsModule } from '@angular/forms';
 import { inject as ngInject, Provider } from '@angular/core';
-import { RouterOutlet, RouterLink } from "@angular/router";
+import { RouterOutlet, RouterLink, Router } from "@angular/router";
 import { MenuRegistryService } from "./menu-registry.service";
 import { BurgerMenuService } from "./burger-menu.service";
 import { DialogService } from "@pos/core-ui";
@@ -18,6 +18,7 @@ import { IdbService } from "@pos/idb-storage";
   styleUrl: "./shell.component.scss"
 })
 export class ShellComponent implements OnInit {
+  private router = inject(Router);
   auth = inject(AuthStateService);
   registry = inject(MenuRegistryService);
   burgerMenu = inject(BurgerMenuService);
@@ -59,6 +60,13 @@ export class ShellComponent implements OnInit {
   logout(): void {
     this.menuOpen.set(false);
     this.auth.logout();
+  }
+
+  handleUserMenuClick(item: any) {
+    this.menuOpen.set(false);
+    if (item.route) {
+      this.router.navigate([item.route]);
+    }
   }
 
   handleBurgerItemClick(item: { id: string; name: string; onClick: () => void }): void {

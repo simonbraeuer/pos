@@ -39,6 +39,7 @@
     (click)="menuOpen.set(!menuOpen())"
     (keydown.enter)="menuOpen.set(!menuOpen())"
     (keydown.space)="menuOpen.set(!menuOpen()); $event.preventDefault()"
+    (mousedown)="$event.stopPropagation()"
   >
     <span class="user-avatar">{{ initials() }}</span>
     <span class="user-info">
@@ -48,9 +49,9 @@
     <span class="user-caret">{{ menuOpen() ? '▲' : '▼' }}</span>
 
     @if (menuOpen()) {
-      <div class="user-menu" (mousedown)="$event.stopPropagation()">
+      <div class="user-menu">
         @for (item of visibleItems(); track item.id) {
-          <a class="user-menu__item" [routerLink]="item.route" (click)="menuOpen.set(false)">
+          <a class="user-menu__item" (click)="handleUserMenuClick(item); $event.stopPropagation()">
             {{ item.icon }} {{ item.label }}
           </a>
         }
